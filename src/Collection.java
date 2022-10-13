@@ -13,5 +13,9 @@ public class Collection {
 
     public void getCollection(){ }
 
+    public void updateCollection() { }
+
+    public void deleteCollection() { }
+
     
 }
