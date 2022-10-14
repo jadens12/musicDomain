@@ -1,0 +1,3 @@
+# Ignore custom run/debug configurations.
+# Most likely contain private information for logging into the database.
+/.vscode/

@@ -9,12 +9,17 @@ public class PostgresSSH {
 
     public static void main(String[] args) throws SQLException {
 
-        int lport = 5432;
+        if (args.length != 2) {
+            System.out.println("Usage: java PostgresSSH username password");
+            System.exit(0);
+        }
+        
+        int lport = 5431;
         String rhost = "starbug.cs.rit.edu";
         int rport = 5432;
-        String user = "YOUR_CS_USERNAME"; //change to your username
-        String password = "YOUR_CS_PASSWORD"; //change to your password
-        String databaseName = "YOUR_DB_NAME"; //change to your database name
+        String user = args[0]; //change to your username
+        String password = args[1]; //change to your password
+        String databaseName = "p32001_18"; //change to your database name
 
         String driverName = "org.postgresql.Driver";
         Connection conn = null;
