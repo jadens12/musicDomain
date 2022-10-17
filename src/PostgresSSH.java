@@ -1,8 +1,6 @@
 import com.jcraft.jsch.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Properties;
 
 public class PostgresSSH {
@@ -50,6 +48,9 @@ public class PostgresSSH {
             System.out.println("Database connection established");
 
             // Do something with the database....
+            Interface musicInterface = new Interface(conn);
+            musicInterface.InitialPrompt();
+            
 
         } catch (Exception e) {
             e.printStackTrace();
