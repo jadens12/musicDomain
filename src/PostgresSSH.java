@@ -49,7 +49,7 @@ public class PostgresSSH {
 
             // Do something with the database....
             Interface musicInterface = new Interface(conn);
-            musicInterface.InitialPrompt();
+            musicInterface.initialPrompt();
             
 
         } catch (Exception e) {

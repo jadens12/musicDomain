@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.Scanner; 
+import java.util.InputMismatchException;
 
 public class Interface {
 
@@ -13,22 +14,33 @@ public class Interface {
         this.scanner = new Scanner(System.in);
     }
     
-    public void InitialPrompt() throws SQLException {
+    public void initialPrompt() throws SQLException {
         System.out.println("Enter the number of your choice:\n"
          + "1) Login with username/password\n"
          + "2) Create a new account");
-        int i = scanner.nextInt();
-        scanner.nextLine(); // throw away "\n"
+        try {
+            int i = scanner.nextInt();
+            scanner.nextLine(); // throw away "\n"
 
-        if (i == 1) {
-            Login();
+            switch (i) {
+                case 1:
+                    login();
+                    break;
+                case 2:
+                    // account creation...
+                    break;
+                default:
+                    System.out.println("Nubmer entered is not a valid option!");
+                    break;
+            }
         }
-        else if (i == 2) {
-            // account creation...
+        catch (InputMismatchException e) {
+            System.out.println("Please enter a number.");
+            initialPrompt();
         }
     }
 
-    public void Login() throws SQLException {
+    public void login() throws SQLException {
         System.out.print("Enter username: ");
         String user = scanner.nextLine();
         System.out.print("Enter password: ");
@@ -42,15 +54,15 @@ public class Interface {
         if (rs.next()) {
             System.out.println("Logged in as " + user + "\n");
             // set access date?
-            HomeScreen();
+            homeScreen();
         }
         else {
             System.out.println("Incorrect login!");
-            Login();
+            login();
         }
     }
 
-    public void HomeScreen() {
+    public void homeScreen() {
         // main menu for app...
     }
 }
