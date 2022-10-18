@@ -1,7 +1,7 @@
 public class Collection {
     
 
-    public void CreateNewCollection() { }
+    public Collection() { }
 
     public void addSong(){ }
 
