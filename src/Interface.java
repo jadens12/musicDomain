@@ -27,7 +27,7 @@ public class Interface {
                     login();
                     break;
                 case 2:
-                    // account creation...
+                    accountCreation();
                     break;
                 default:
                     System.out.println("Nubmer entered is not a valid option!");
@@ -42,17 +42,17 @@ public class Interface {
 
     public void login() throws SQLException {
         System.out.print("Enter username: ");
-        String user = scanner.nextLine();
+        String username = scanner.nextLine();
         System.out.print("Enter password: ");
-        String pass = scanner.nextLine();
+        String password = scanner.nextLine();
 
         PreparedStatement pst = conn.prepareStatement("SELECT * FROM users WHERE username = ? AND password = ?");
-        pst.setString(1, user);
-        pst.setString(2, pass);
+        pst.setString(1, username);
+        pst.setString(2, password);
         ResultSet rs = pst.executeQuery();
 
         if (rs.next()) {
-            System.out.println("Logged in as " + user + "\n");
+            System.out.println("Logged in as " + username + "\n");
             // set access date?
             homeScreen();
         }
@@ -60,6 +60,60 @@ public class Interface {
             System.out.println("Incorrect login!");
             login();
         }
+    }
+
+    public void accountCreation() throws SQLException {
+        // check if username taken
+        String newUsername;
+        while (true) {
+            do {
+                System.out.print("Create a username: ");
+                newUsername = scanner.nextLine();
+            } while (newUsername.equals(""));
+
+            PreparedStatement pst = conn.prepareStatement("SELECT * FROM users WHERE username = ?");
+            pst.setString(1, newUsername);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                System.out.println("Username is taken!");
+            }
+            else {
+                break;
+            }
+        }
+
+        String newPassword;
+        do {
+            System.out.print("Create a password: ");
+            newPassword = scanner.nextLine();
+        } while (newPassword.equals(""));
+
+        String email;
+        do {
+            System.out.print("Enter your email: ");
+            email = scanner.nextLine();
+        } while (email.equals(""));
+
+        String name[] = new String[2];
+        do {
+            System.out.print("Enter your first and last name: ");
+            name = scanner.nextLine().split(" ", 2);
+        } while (name[0].equals("") && name[1].equals(""));
+
+        PreparedStatement pst = conn.prepareStatement("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?)");
+        pst.setString(1, email);
+        pst.setString(2, newUsername);
+        pst.setString(3, newPassword);
+        pst.setString(4, name[0]);
+        pst.setString(5, name[1]);
+        java.sql.Date todayDate = new java.sql.Date(System.currentTimeMillis());
+        pst.setDate(6, todayDate);
+        pst.setDate(7, todayDate);
+        pst.executeUpdate();
+
+        System.out.println("Account '" + newUsername + "' has been created!");
+        homeScreen();
     }
 
     public void homeScreen() {
