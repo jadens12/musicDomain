@@ -52,8 +52,13 @@ public class Interface {
         ResultSet rs = pst.executeQuery();
 
         if (rs.next()) {
+            java.sql.Date todayDate = new Date(System.currentTimeMillis());
+            PreparedStatement pst2 = conn.prepareStatement("UPDATE users SET last_access_date = ? WHERE username = ?");
+            pst2.setDate(1, todayDate);
+            pst2.setString(2, username);
+            pst2.executeUpdate();
+
             System.out.println("Logged in as " + username + "\n");
-            // set access date?
             homeScreen();
         }
         else {
@@ -107,7 +112,7 @@ public class Interface {
         pst.setString(3, newPassword);
         pst.setString(4, name[0]);
         pst.setString(5, name[1]);
-        java.sql.Date todayDate = new java.sql.Date(System.currentTimeMillis());
+        java.sql.Date todayDate = new Date(System.currentTimeMillis());
         pst.setDate(6, todayDate);
         pst.setDate(7, todayDate);
         pst.executeUpdate();
