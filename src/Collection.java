@@ -9,8 +9,7 @@ public class Collection {
     public static void addSong(Connection conn, Scanner scanner, String username) throws SQLException {
         System.out.println("Enter collection name: ");
         String collectionName = scanner.nextLine();
-        PreparedStatement collectionQuery = conn
-                .prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
+        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
         collectionQuery.setString(1, collectionName);
         collectionQuery.setString(2, username);
         ResultSet collectionResult = collectionQuery.executeQuery();
@@ -31,13 +30,16 @@ public class Collection {
         }
         int sid = songResult.getInt("sid");
 
-        PreparedStatement insertQuery = conn.prepareStatement("INSERT INTO song_playlist (sid, pid) VALUES (?, ?)");
+        PreparedStatement insertQuery = conn.prepareStatement("INSERT INTO song_playlist (sid, pid) "
+                + "SELECT ?, ? WHERE NOT EXISTS (SELECT * FROM song_playlist WHERE sid = ? and pid = ?)");
         insertQuery.setInt(1, sid);
         insertQuery.setInt(2, pid);
+        insertQuery.setInt(3, sid);
+        insertQuery.setInt(4, pid);
         if (insertQuery.executeUpdate() == 1) {
             System.out.println(songName + " successfully added to " + collectionName + "!");
         } else {
-            System.out.println("Error: unable to add " + songName + " to " + collectionName);
+            System.out.println(songName + " already in " + collectionName);
         }
     }
 
@@ -75,13 +77,16 @@ public class Collection {
             ResultSet oneSongResult = songQuery.executeQuery();
             oneSongResult.next();
             String songName = oneSongResult.getString(1);
-            PreparedStatement insertQuery = conn.prepareStatement("INSERT INTO song_playlist (sid, pid) VALUES (?, ?)");
+            PreparedStatement insertQuery = conn.prepareStatement("INSERT INTO song_playlist (sid, pid) "
+                    + "SELECT ?, ? WHERE NOT EXISTS (SELECT * FROM song_playlist WHERE sid = ? and pid = ?)");
             insertQuery.setInt(1, sid);
             insertQuery.setInt(2, pid);
+            insertQuery.setInt(3, sid);
+            insertQuery.setInt(4, pid);
             if (insertQuery.executeUpdate() == 1) {
                 System.out.println(songName + " successfully added to " + collectionName + "!");
             } else {
-                System.out.println("Error: unable to add " + songName + " to " + collectionName);
+                System.out.println(songName + " already in " + collectionName);
             }
         }
     }
@@ -104,7 +109,7 @@ public class Collection {
         PreparedStatement findSongQuery = conn.prepareStatement("SELECT sid FROM song WHERE title = ?");
         findSongQuery.setString(1, songName);
         ResultSet songResult = findSongQuery.executeQuery();
-        if (!songResult.next()){
+        if (!songResult.next()) {
             System.out.println("Song not found.");
             return;
         }
@@ -115,13 +120,12 @@ public class Collection {
         deleteSongQuery.setInt(2, pid);
         if (deleteSongQuery.executeUpdate() == 1) {
             System.out.println(songName + " successfully deleted from " + collectionName + "!");
-        }
-        else {
-            System.out.println("Error: unable to delete " + songName + " from " + collectionName);
+        } else {
+            System.out.println(songName + " not in " + collectionName);
         }
     }
 
-    public static void deleteAlbum(Connection conn, Scanner scanner, String username) throws SQLException{
+    public static void deleteAlbum(Connection conn, Scanner scanner, String username) throws SQLException {
         System.out.println("Enter collection name: ");
         String collectionName = scanner.nextLine();
         PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
@@ -161,9 +165,8 @@ public class Collection {
             deleteQuery.setInt(2, pid);
             if (deleteQuery.executeUpdate() == 1) {
                 System.out.println(songName + " successfully deleted from " + collectionName + "!");
-            }
-            else {
-                System.out.println("Error: unable to delete " + songName + " from " + collectionName);
+            } else {
+                System.out.println(songName + " not in " + collectionName);
             }
         }
     }
