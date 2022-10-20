@@ -151,7 +151,8 @@ public class Interface {
                     System.out.println("1) View collection\n"
                     + "2) Add song to collection\n"
                     + "3) Add album to collection\n"
-                    + "4) Delete song from collection");
+                    + "4) Delete song from collection\n"
+                    + "5) Delete album from collection");
                     int choice = scanner.nextInt();
                     scanner.nextLine();
                     switch (choice) {
@@ -166,6 +167,9 @@ public class Interface {
                             break;
                         case 4:
                             Collection.deleteSong(conn, scanner, currentUsername);
+                            break;
+                        case 5:
+                            Collection.deleteAlbum(conn, scanner, currentUsername);
                             break;
                         default:
                             //do stuff
