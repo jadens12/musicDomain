@@ -1,20 +1,20 @@
 import java.sql.*;
 import java.util.Scanner;
 
-
 public class Collection {
-    
 
-    public Collection() { }
+    public Collection() {
+    }
 
-    public static void addSong(Connection conn, Scanner scanner, String username) throws SQLException{
+    public static void addSong(Connection conn, Scanner scanner, String username) throws SQLException {
         System.out.println("Enter collection name: ");
         String collectionName = scanner.nextLine();
-        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
+        PreparedStatement collectionQuery = conn
+                .prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
         collectionQuery.setString(1, collectionName);
         collectionQuery.setString(2, username);
         ResultSet collectionResult = collectionQuery.executeQuery();
-        if(!collectionResult.next()){
+        if (!collectionResult.next()) {
             System.out.println("Collection not found.");
             return;
         }
@@ -25,7 +25,7 @@ public class Collection {
         PreparedStatement songQuery = conn.prepareStatement("SELECT sid FROM song WHERE title = ?");
         songQuery.setString(1, songName);
         ResultSet songResult = songQuery.executeQuery();
-        if(!songResult.next()){
+        if (!songResult.next()) {
             System.out.println("Song not found.");
             return;
         }
@@ -34,22 +34,71 @@ public class Collection {
         PreparedStatement insertQuery = conn.prepareStatement("INSERT INTO song_playlist (sid, pid) VALUES (?, ?)");
         insertQuery.setInt(1, sid);
         insertQuery.setInt(2, pid);
-        if( insertQuery.executeUpdate() == 1 ){
+        if (insertQuery.executeUpdate() == 1) {
             System.out.println(songName + " successfully added to " + collectionName + "!");
+        } else {
+            System.out.println("Error: unable to add " + songName + " to " + collectionName);
         }
     }
 
-    public void addAlbum(){ }
+    public static void addAlbum(Connection conn, Scanner scanner, String username) throws SQLException {
+        System.out.println("Enter collection name: ");
+        String collectionName = scanner.nextLine();
+        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
+        collectionQuery.setString(1, collectionName);
+        collectionQuery.setString(2, username);
+        ResultSet collectionResult = collectionQuery.executeQuery();
+        if (!collectionResult.next()) {
+            System.out.println("Collection not found.");
+            return;
+        }
+        int pid = collectionResult.getInt("pid");
 
-    public void deleteSong(){ }
+        System.out.println("Enter album name: ");
+        String albumName = scanner.nextLine();
+        PreparedStatement albumQuery = conn.prepareStatement("SELECT aid FROM album WHERE name = ?");
+        albumQuery.setString(1, albumName);
+        ResultSet albumResult = albumQuery.executeQuery();
+        if (!albumResult.next()) {
+            System.out.println("Album not found.");
+            return;
+        }
+        int aid = albumResult.getInt("aid");
 
-    public void deleteAlbum(){ }
+        PreparedStatement findSongsQuery = conn.prepareStatement("SELECT sid FROM album_song WHERE aid = ?");
+        findSongsQuery.setInt(1, aid);
+        ResultSet songsResult = findSongsQuery.executeQuery();
+        while (songsResult.next()) {
+            int sid = songsResult.getInt(1);
+            PreparedStatement songQuery = conn.prepareStatement("SELECT title FROM song WHERE sid = ?");
+            songQuery.setInt(1, sid);
+            ResultSet oneSongResult = songQuery.executeQuery();
+            oneSongResult.next();
+            String songName = oneSongResult.getString(1);
+            PreparedStatement insertQuery = conn.prepareStatement("INSERT INTO song_playlist (sid, pid) VALUES (?, ?)");
+            insertQuery.setInt(1, sid);
+            insertQuery.setInt(2, pid);
+            if (insertQuery.executeUpdate() == 1) {
+                System.out.println(songName + " successfully added to " + collectionName + "!");
+            } else {
+                System.out.println("Error: unable to add " + songName + " to " + collectionName);
+            }
+        }
+    }
 
-    public void getCollection(){ }
+    public void deleteSong() {
+    }
 
-    public void updateCollection() { }
+    public void deleteAlbum() {
+    }
 
-    public void deleteCollection() { }
+    public void getCollection() {
+    }
 
-    
+    public void updateCollection() {
+    }
+
+    public void deleteCollection() {
+    }
+
 }
