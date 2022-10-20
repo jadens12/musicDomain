@@ -86,7 +86,39 @@ public class Collection {
         }
     }
 
-    public void deleteSong() {
+    public static void deleteSong(Connection conn, Scanner scanner, String username) throws SQLException {
+        System.out.println("Enter collection name: ");
+        String collectionName = scanner.nextLine();
+        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
+        collectionQuery.setString(1, collectionName);
+        collectionQuery.setString(2, username);
+        ResultSet collectionResult = collectionQuery.executeQuery();
+        if (!collectionResult.next()) {
+            System.out.println("Collection not found.");
+            return;
+        }
+        int pid = collectionResult.getInt("pid");
+
+        System.out.println("Enter song name: ");
+        String songName = scanner.nextLine();
+        PreparedStatement findSongQuery = conn.prepareStatement("SELECT sid FROM song WHERE title = ?");
+        findSongQuery.setString(1, songName);
+        ResultSet songResult = findSongQuery.executeQuery();
+        if (!songResult.next()){
+            System.out.println("Song not found.");
+            return;
+        }
+        int sid = songResult.getInt("sid");
+
+        PreparedStatement deleteSongQuery = conn.prepareStatement("DELETE FROM song_playlist WHERE sid = ? and pid = ?");
+        deleteSongQuery.setInt(1, sid);
+        deleteSongQuery.setInt(2, pid);
+        if (deleteSongQuery.executeUpdate() == 1) {
+            System.out.println(songName + "successfully deleted from " + collectionName + "!");
+        }
+        else {
+            System.out.println("Error: unable to delete " + songName + " from " + collectionName);
+        }
     }
 
     public void deleteAlbum() {
