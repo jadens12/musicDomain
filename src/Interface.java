@@ -128,12 +128,14 @@ public class Interface {
     }
 
     public void homeScreen() throws SQLException{
-        System.out.println("Enter the number of your choice:\n"
+        while(true) {
+            System.out.println("Enter the number of your choice:\n"
          + "1) Create Collection\n"
          + "2) My Collections\n"
          + "3) Search\n"
          + "4) Friends\n"
-         + "5) Listen");
+         + "5) Listen\n"
+         + "6) Quit");
         try {
             int i = scanner.nextInt();
             scanner.nextLine(); // throw away "\n"
@@ -167,6 +169,8 @@ public class Interface {
                             break;
                     }
                     break;
+                case 6:
+                    return;
                 default:
                     System.out.println("Number entered is not a valid option!");
                     break;
@@ -175,6 +179,7 @@ public class Interface {
         catch (InputMismatchException e) {
             System.out.println("Please enter a number.");
             homeScreen();
+        }
         }
     }
 
@@ -198,6 +203,5 @@ public class Interface {
         pst.executeUpdate();
 
         System.out.println("Collection '" + playlistName + "' has been created!");
-        homeScreen();
     }
 }
