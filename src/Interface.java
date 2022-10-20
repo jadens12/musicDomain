@@ -132,7 +132,8 @@ public class Interface {
          + "1) Create Collection\n"
          + "2) My Collections\n"
          + "3) Search\n"
-         + "4) Friends");
+         + "4) Friends\n"
+         + "5) Listen");
         try {
             int i = scanner.nextInt();
             scanner.nextLine(); // throw away "\n"
@@ -151,6 +152,21 @@ public class Interface {
                     // also allow user to play song? i guess? not sure...
                 case 4:
                     // friend stuff
+                case 5:
+                    System.out.println("1) Listen to a song\n" + "2) Listen to an album");
+                    int listen = scanner.nextInt();
+                    switch (listen) {
+                        case 1:
+                            System.out.println("Listening to a song!");
+                            break;
+                        case 2:
+                            System.out.println("Listening to an album!");
+                            break;
+                        default:
+                            System.out.println("Number entered is not a valid option!");
+                            break;
+                    }
+                    break;
                 default:
                     System.out.println("Number entered is not a valid option!");
                     break;
