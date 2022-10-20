@@ -129,7 +129,7 @@ public class Interface {
 
     public void homeScreen() throws SQLException{
         while(true) {
-            System.out.println("Enter the number of your choice:\n"
+        System.out.println("Enter the number of your choice:\n"
          + "1) Create Collection\n"
          + "2) My Collections\n"
          + "3) Search\n"
@@ -147,6 +147,21 @@ public class Interface {
                 case 2:
                     // view collections stuff?
                     // offer possibilities to play, rename, delete
+                    // add and delete songs from collections
+                    System.out.println("1) View collection\n"
+                    + "2) Add song to collection");
+                    int choice = scanner.nextInt();
+                    scanner.nextLine();
+                    switch (choice) {
+                        case 1:
+                            // do stuff
+                            break;
+                        case 2:
+                            Collection.addSong(conn, scanner, currentUsername);
+                            break;
+                        default:
+                            //do stuff
+                    }
                     break;
                 case 3:
                     // all search stuff: by song, by artist, by album, by genre
