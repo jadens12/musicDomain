@@ -45,10 +45,11 @@ public class Interface {
         String username = scanner.nextLine();
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
+        int hashPass = password.hashCode();
 
         PreparedStatement pst = conn.prepareStatement("SELECT * FROM users WHERE username = ? AND password = ?");
         pst.setString(1, username);
-        pst.setString(2, password);
+        pst.setString(2, Integer.toString(hashPass));
         ResultSet rs = pst.executeQuery();
 
         if (rs.next()) {
@@ -93,6 +94,7 @@ public class Interface {
             System.out.print("Create a password: ");
             newPassword = scanner.nextLine();
         } while (newPassword.equals(""));
+        int hashPass = newPassword.hashCode();
 
         String email;
         do {
@@ -109,7 +111,7 @@ public class Interface {
         PreparedStatement pst = conn.prepareStatement("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?)");
         pst.setString(1, email);
         pst.setString(2, newUsername);
-        pst.setString(3, newPassword);
+        pst.setString(3, Integer.toString(hashPass));
         pst.setString(4, name[0]);
         pst.setString(5, name[1]);
         java.sql.Date todayDate = new Date(System.currentTimeMillis());
