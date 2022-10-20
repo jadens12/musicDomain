@@ -124,6 +124,37 @@ public class Interface {
     }
 
     public void homeScreen() {
-        // main menu for app...
+        System.out.println("Enter the number of your choice:\n"
+         + "1) Create Collection\n"
+         + "2) My Collections\n"
+         + "3) Search\n"
+         + "4) Friends");
+        try {
+            int i = scanner.nextInt();
+            scanner.nextLine(); // throw away "\n"
+
+            switch (i) {
+                case 1:
+                    // create collection stuff
+                    break;
+                case 2:
+                    // view collections stuff?
+                    // offer possibilities to play, rename, delete
+                    break;
+                case 3:
+                    // all search stuff: by song, by artist, by album, by genre
+                    // allow users to add song or album to collection?
+                    // also allow user to play song? i guess? not sure...
+                case 4:
+                    // friend stuff
+                default:
+                    System.out.println("Number entered is not a valid option!");
+                    break;
+            }
+        }
+        catch (InputMismatchException e) {
+            System.out.println("Please enter a number.");
+            homeScreen();
+        }
     }
 }
