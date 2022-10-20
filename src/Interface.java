@@ -7,6 +7,8 @@ public class Interface {
     Connection conn;
     Statement st;
     Scanner scanner;
+
+    String currentUsername;
     
     public Interface(Connection conn) throws SQLException {
         this.conn = conn;
@@ -60,6 +62,7 @@ public class Interface {
             pst2.executeUpdate();
 
             System.out.println("Logged in as " + username + "\n");
+            currentUsername = username;
             homeScreen();
         }
         else {
@@ -120,10 +123,11 @@ public class Interface {
         pst.executeUpdate();
 
         System.out.println("Account '" + newUsername + "' has been created!");
+        currentUsername = newUsername;
         homeScreen();
     }
 
-    public void homeScreen() {
+    public void homeScreen() throws SQLException{
         System.out.println("Enter the number of your choice:\n"
          + "1) Create Collection\n"
          + "2) My Collections\n"
@@ -135,7 +139,7 @@ public class Interface {
 
             switch (i) {
                 case 1:
-                    // create collection stuff
+                    createCollection();
                     break;
                 case 2:
                     // view collections stuff?
@@ -156,5 +160,28 @@ public class Interface {
             System.out.println("Please enter a number.");
             homeScreen();
         }
+    }
+
+    public void createCollection() throws SQLException {
+        String playlistName;
+        do {
+            System.out.print("Name of collection: ");
+            playlistName = scanner.nextLine();
+        } while (playlistName.equals(""));
+
+        int newID = 0;
+        ResultSet rs = st.executeQuery("SELECT COUNT(pid) FROM playlist");
+        while (rs.next()) {
+            newID = rs.getInt(1) +  1;
+        }
+
+        PreparedStatement pst = conn.prepareStatement("INSERT INTO playlist VALUES (?, ?, ?)");
+        pst.setInt(1, newID);
+        pst.setString(2, currentUsername);
+        pst.setString(3, playlistName);
+        pst.executeUpdate();
+
+        System.out.println("Collection '" + playlistName + "' has been created!");
+        homeScreen();
     }
 }
