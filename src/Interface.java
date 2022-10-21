@@ -182,19 +182,7 @@ public class Interface {
                 case 4:
                     // friend stuff
                 case 5:
-                    System.out.println("1) Listen to a song\n" + "2) Listen to an album");
-                    int listen = scanner.nextInt();
-                    switch (listen) {
-                        case 1:
-                            System.out.println("Listening to a song!");
-                            break;
-                        case 2:
-                            System.out.println("Listening to an album!");
-                            break;
-                        default:
-                            System.out.println("Number entered is not a valid option!");
-                            break;
-                    }
+                    listen();
                     break;
                 case 6:
                     return;
@@ -230,5 +218,32 @@ public class Interface {
         pst.executeUpdate();
 
         System.out.println("Collection '" + playlistName + "' has been created!");
+    }
+
+    /// For listening to a song or an album
+    /// User types in name of song or name of album
+    /// Each song is added to User-Song relation table
+    public void listen() throws SQLException {
+        System.out.println("1) Listen to a song\n" + "2) Listen to an album\n" + "3) Back");
+        int listen = scanner.nextInt();
+        scanner.nextLine();
+        switch (listen) {
+            case 1:
+                System.out.print("Enter song name: ");
+                String songName = scanner.nextLine();
+                Listen.listenSong(conn, scanner, songName);
+                break;
+            case 2:
+                System.out.print("Enter album name: ");
+                String albumName = scanner.nextLine();
+                Listen.listenAlbum(conn, scanner, albumName);
+                break;
+            case 3:
+                break;
+            default:
+                System.out.println("Number entered is not a valid option!");
+                
+        }
+
     }
 }
