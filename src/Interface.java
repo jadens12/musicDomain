@@ -171,11 +171,12 @@ public class Interface {
         + "1) Create collection\n"
         + "2) List all collections\n"
         + "3) View collection\n"
-        + "4) Add song to collection\n"
-        + "5) Add album to collection\n"
-        + "6) Delete song from collection\n"
-        + "7) Delete album from collection\n"
-        + "8) Back");
+        + "4) Rename collection\n"
+        + "5) Add song to collection\n"
+        + "6) Add album to collection\n"
+        + "7) Delete song from collection\n"
+        + "8) Delete album from collection\n"
+        + "9) Back");
         int choice = scanner.nextInt();
         scanner.nextLine();
         switch (choice) {
@@ -189,18 +190,21 @@ public class Interface {
                 // view collection...
                 break;
             case 4:
-                Collection.addSong(conn, scanner, currentUsername);
+                Collection.renameCollection(conn, scanner, currentUsername);
                 break;
             case 5:
-                Collection.addAlbum(conn, scanner, currentUsername);
+                Collection.addSong(conn, scanner, currentUsername);
                 break;
             case 6:
-                Collection.deleteSong(conn, scanner, currentUsername);
+                Collection.addAlbum(conn, scanner, currentUsername);
                 break;
             case 7:
-                Collection.deleteAlbum(conn, scanner, currentUsername);
+                Collection.deleteSong(conn, scanner, currentUsername);
                 break;
             case 8:
+                Collection.deleteAlbum(conn, scanner, currentUsername);
+                break;
+            case 9:
                 return;
             default:
                 System.out.println("Number entered is not a valid option!");

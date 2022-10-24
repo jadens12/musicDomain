@@ -45,6 +45,39 @@ public class Collection {
         }
     }
 
+    public static void renameCollection(Connection conn, Scanner scanner, String username) throws SQLException {
+        System.out.print("\nEnter collection name: ");
+        String collectionName = scanner.nextLine();
+        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
+        collectionQuery.setString(1, collectionName);
+        collectionQuery.setString(2, username);
+        ResultSet collectionResult = collectionQuery.executeQuery();
+        if (!collectionResult.next()) {
+            System.out.println("Collection not found.");
+            return;
+        }
+        int pid = collectionResult.getInt("pid");
+
+        System.out.print("Enter new name: ");
+        String newName = scanner.nextLine();
+
+        PreparedStatement nameQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
+        nameQuery.setString(1, newName);
+        nameQuery.setString(2, username);
+        ResultSet nameResult = nameQuery.executeQuery();
+        if (nameResult.next()) {
+            System.out.println("There is already a collection with that name!");
+        }
+        else {
+            PreparedStatement cNameUpdate = conn.prepareStatement("UPDATE playlist SET name = ? WHERE pid = ?");
+            cNameUpdate.setString(1, newName);
+            cNameUpdate.setInt(2, pid);
+            cNameUpdate.executeUpdate();
+
+            System.out.print("Collection renamed!");
+        }
+    }
+
     public static void addSong(Connection conn, Scanner scanner, String username) throws SQLException {
         System.out.println("Enter collection name: ");
         String collectionName = scanner.nextLine();
