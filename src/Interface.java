@@ -5,14 +5,12 @@ import java.util.InputMismatchException;
 public class Interface {
 
     Connection conn;
-    Statement st;
     Scanner scanner;
 
     String currentUsername;
     
     public Interface(Connection conn) throws SQLException {
         this.conn = conn;
-        this.st = this.conn.createStatement();
         this.scanner = new Scanner(System.in);
     }
     
@@ -142,7 +140,7 @@ public class Interface {
 
             switch (i) {
                 case 1:
-                    createCollection();
+                    Collection.createCollection(conn, scanner, currentUsername);
                     break;
                 case 2:
                     // view collections stuff?
@@ -196,28 +194,6 @@ public class Interface {
             homeScreen();
         }
         }
-    }
-
-    public void createCollection() throws SQLException {
-        String playlistName;
-        do {
-            System.out.print("Name of collection: ");
-            playlistName = scanner.nextLine();
-        } while (playlistName.equals(""));
-
-        int newID = 0;
-        ResultSet rs = st.executeQuery("SELECT COUNT(pid) FROM playlist");
-        while (rs.next()) {
-            newID = rs.getInt(1) +  1;
-        }
-
-        PreparedStatement pst = conn.prepareStatement("INSERT INTO playlist VALUES (?, ?, ?)");
-        pst.setInt(1, newID);
-        pst.setString(2, currentUsername);
-        pst.setString(3, playlistName);
-        pst.executeUpdate();
-
-        System.out.println("Collection '" + playlistName + "' has been created!");
     }
 
     /// For listening to a song or an album
