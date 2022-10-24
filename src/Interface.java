@@ -128,61 +128,61 @@ public class Interface {
     public void homeScreen() throws SQLException{
         while(true) {
         System.out.println("Enter the number of your choice:\n"
-         + "1) Create Collection\n"
-         + "2) My Collections\n"
-         + "3) Search\n"
-         + "4) Friends\n"
-         + "5) Listen\n"
-         + "6) Quit");
+         + "1) My Collections\n"
+         + "2) Search\n"
+         + "3) Friends\n"
+         + "4) Listen\n"
+         + "5) Quit");
         try {
             int i = scanner.nextInt();
             scanner.nextLine(); // throw away "\n"
 
             switch (i) {
                 case 1:
-                    Collection.createCollection(conn, scanner, currentUsername);
-                    break;
-                case 2:
                     // view collections stuff?
                     // offer possibilities to play, rename, delete
                     // add and delete songs from collections
-                    System.out.println("1) View collection\n"
-                    + "2) Add song to collection\n"
-                    + "3) Add album to collection\n"
-                    + "4) Delete song from collection\n"
-                    + "5) Delete album from collection");
+                    System.out.println("1) Create collection\n"
+                    + "2) View collection\n"
+                    + "3) Add song to collection\n"
+                    + "4) Add album to collection\n"
+                    + "5) Delete song from collection\n"
+                    + "6) Delete album from collection");
                     int choice = scanner.nextInt();
                     scanner.nextLine();
                     switch (choice) {
                         case 1:
-                            // do stuff
+                            Collection.createCollection(conn, scanner, currentUsername);
                             break;
                         case 2:
-                            Collection.addSong(conn, scanner, currentUsername);
+                            // do stuff
                             break;
                         case 3:
-                            Collection.addAlbum(conn, scanner, currentUsername);
+                            Collection.addSong(conn, scanner, currentUsername);
                             break;
                         case 4:
-                            Collection.deleteSong(conn, scanner, currentUsername);
+                            Collection.addAlbum(conn, scanner, currentUsername);
                             break;
                         case 5:
+                            Collection.deleteSong(conn, scanner, currentUsername);
+                            break;
+                        case 6:
                             Collection.deleteAlbum(conn, scanner, currentUsername);
                             break;
                         default:
                             //do stuff
                     }
                     break;
-                case 3:
+                case 2:
                     // all search stuff: by song, by artist, by album, by genre
                     // allow users to add song or album to collection?
                     // also allow user to play song? i guess? not sure...
-                case 4:
+                case 3:
                     // friend stuff
-                case 5:
+                case 4:
                     listen();
                     break;
-                case 6:
+                case 5:
                     return;
                 default:
                     System.out.println("Number entered is not a valid option!");
