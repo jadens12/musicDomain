@@ -15,7 +15,7 @@ public class Collection {
         } while (playlistName.equals(""));
 
         int newID = 0;
-        ResultSet rs = conn.createStatement().executeQuery("SELECT COUNT(pid) FROM playlist");
+        ResultSet rs = conn.createStatement().executeQuery("SELECT MAX(pid) FROM playlist");
         while (rs.next()) {
             newID = rs.getInt(1) +  1;
         }
