@@ -78,6 +78,40 @@ public class Collection {
         }
     }
 
+    public static void deleteCollection(Connection conn, Scanner scanner, String username) throws SQLException {
+        System.out.print("\nEnter collection name: ");
+        String collectionName = scanner.nextLine();
+        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
+        collectionQuery.setString(1, collectionName);
+        collectionQuery.setString(2, username);
+        ResultSet collectionResult = collectionQuery.executeQuery();
+        if (!collectionResult.next()) {
+            System.out.println("Collection not found.");
+            return;
+        }
+        int pid = collectionResult.getInt("pid");
+
+        while (true) {
+            System.out.print("Are you sure you want to delete this collection? (Y/N): ");
+            String confirm = scanner.nextLine();
+
+            if (confirm.equals("Y")) {
+                PreparedStatement collectionDelete = conn.prepareStatement("DELETE FROM playlist WHERE pid = ?");
+                collectionDelete.setInt(1, pid);
+                collectionDelete.executeUpdate();
+
+                System.out.println("Collection deleted!");
+                return;
+            }
+            else if (confirm.equals("N")) {
+                return;
+            }
+            else {
+                System.out.println("Please enter either Y or N to confirm.");
+            }
+        }
+    }
+
     public static void addSong(Connection conn, Scanner scanner, String username) throws SQLException {
         System.out.println("Enter collection name: ");
         String collectionName = scanner.nextLine();

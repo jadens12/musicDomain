@@ -184,11 +184,12 @@ public class Interface {
             + "2) List all collections\n"
             + "3) View collection\n"
             + "4) Rename collection\n"
-            + "5) Add song to collection\n"
-            + "6) Add album to collection\n"
-            + "7) Delete song from collection\n"
-            + "8) Delete album from collection\n"
-            + "9) Back");
+            + "5) Delete collection\n"
+            + "6) Add song to collection\n"
+            + "7) Add album to collection\n"
+            + "8) Delete song from collection\n"
+            + "9) Delete album from collection\n"
+            + "0) Back");
 
             int choice;
             try {
@@ -202,6 +203,8 @@ public class Interface {
             }
             
             switch (choice) {
+                case 0:
+                    return;
                 case 1:
                     Collection.createCollection(conn, scanner, currentUsername);
                     break;
@@ -215,19 +218,20 @@ public class Interface {
                     Collection.renameCollection(conn, scanner, currentUsername);
                     break;
                 case 5:
-                    Collection.addSong(conn, scanner, currentUsername);
+                    Collection.deleteCollection(conn, scanner, currentUsername);
                     break;
                 case 6:
-                    Collection.addAlbum(conn, scanner, currentUsername);
+                    Collection.addSong(conn, scanner, currentUsername);
                     break;
                 case 7:
-                    Collection.deleteSong(conn, scanner, currentUsername);
+                    Collection.addAlbum(conn, scanner, currentUsername);
                     break;
                 case 8:
-                    Collection.deleteAlbum(conn, scanner, currentUsername);
+                    Collection.deleteSong(conn, scanner, currentUsername);
                     break;
                 case 9:
-                    return;
+                    Collection.deleteAlbum(conn, scanner, currentUsername);
+                    break;
                 default:
                     System.out.println("Number entered is not a valid option!");
                     break;
