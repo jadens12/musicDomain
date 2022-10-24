@@ -139,46 +139,52 @@ public class Interface {
 
             switch (i) {
                 case 1:
-                    // view collections stuff?
-                    // offer possibilities to play, rename, delete
-                    // add and delete songs from collections
-                    System.out.println("1) Create collection\n"
-                    + "2) View collection\n"
-                    + "3) Add song to collection\n"
-                    + "4) Add album to collection\n"
-                    + "5) Delete song from collection\n"
-                    + "6) Delete album from collection");
-                    int choice = scanner.nextInt();
-                    scanner.nextLine();
-                    switch (choice) {
-                        case 1:
-                            Collection.createCollection(conn, scanner, currentUsername);
-                            break;
-                        case 2:
-                            // do stuff
-                            break;
-                        case 3:
-                            Collection.addSong(conn, scanner, currentUsername);
-                            break;
-                        case 4:
-                            Collection.addAlbum(conn, scanner, currentUsername);
-                            break;
-                        case 5:
-                            Collection.deleteSong(conn, scanner, currentUsername);
-                            break;
-                        case 6:
-                            Collection.deleteAlbum(conn, scanner, currentUsername);
-                            break;
-                        default:
-                            //do stuff
+                    while (true) {
+                        System.out.println("1) Create collection\n"
+                        + "2) View all collections\n"
+                        + "3) Add song to collection\n"
+                        + "4) Add album to collection\n"
+                        + "5) Delete song from collection\n"
+                        + "6) Delete album from collection\n"
+                        + "7) Back");
+                        int choice = scanner.nextInt();
+                        scanner.nextLine();
+                        switch (choice) {
+                            case 1:
+                                Collection.createCollection(conn, scanner, currentUsername);
+                                break;
+                            case 2:
+                                Collection.displayAll(conn, scanner, currentUsername);
+                                break;
+                            case 3:
+                                Collection.addSong(conn, scanner, currentUsername);
+                                break;
+                            case 4:
+                                Collection.addAlbum(conn, scanner, currentUsername);
+                                break;
+                            case 5:
+                                Collection.deleteSong(conn, scanner, currentUsername);
+                                break;
+                            case 6:
+                                Collection.deleteAlbum(conn, scanner, currentUsername);
+                                break;
+                            case 7:
+                                break;
+                            default:
+                                System.out.println("Nubmer entered is not a valid option!");
+                                break;
+                        }
+                        break;
                     }
                     break;
                 case 2:
                     // all search stuff: by song, by artist, by album, by genre
                     // allow users to add song or album to collection?
                     // also allow user to play song? i guess? not sure...
+                    break;
                 case 3:
                     // friend stuff
+                    break;
                 case 4:
                     listen();
                     break;

@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Collection {
@@ -26,6 +27,22 @@ public class Collection {
         pst.executeUpdate();
 
         System.out.println("Collection '" + playlistName + "' has been created!");
+    }
+
+    public static void displayAll(Connection conn, Scanner scanner, String username) throws SQLException {
+        ArrayList<String> collectionNames = new ArrayList<>();
+
+        PreparedStatement pst = conn.prepareStatement("SELECT name FROM playlist WHERE username = ?");
+        pst.setString(1, username);
+        ResultSet rs = pst.executeQuery();
+        while (rs.next()) {
+            collectionNames.add(rs.getString(1));
+        }
+
+        System.out.println("My collections:");
+        for (String name : collectionNames) {
+            System.out.println(name);
+        }
     }
 
     public static void addSong(Connection conn, Scanner scanner, String username) throws SQLException {
