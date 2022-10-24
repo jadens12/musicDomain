@@ -31,21 +31,21 @@ public class PostgresSSH {
             session.setConfig(config);
             session.setConfig("PreferredAuthentications","publickey,keyboard-interactive,password");
             session.connect();
-            System.out.println("Connected");
+            // System.out.println("Connected");
             int assigned_port = session.setPortForwardingL(lport, "localhost", rport);
-            System.out.println("Port Forwarded");
+            // System.out.println("Port Forwarded");
 
             // Assigned port could be different from 5432 but rarely happens
             String url = "jdbc:postgresql://localhost:"+ assigned_port + "/" + databaseName;
 
-            System.out.println("database Url: " + url);
+            // System.out.println("database Url: " + url);
             Properties props = new Properties();
             props.put("user", user);
             props.put("password", password);
 
             Class.forName(driverName);
             conn = DriverManager.getConnection(url, props);
-            System.out.println("Database connection established");
+            // System.out.println("Database connection established");
 
             // Do something with the database....
             Interface musicInterface = new Interface(conn);

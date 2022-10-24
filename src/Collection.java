@@ -39,9 +39,9 @@ public class Collection {
             collectionNames.add(rs.getString(1));
         }
 
-        System.out.println("My collections:");
+        System.out.println("\nMy collections:");
         for (String name : collectionNames) {
-            System.out.println(name);
+            System.out.println(" - " + name);
         }
     }
 

@@ -15,7 +15,7 @@ public class Interface {
     }
     
     public void initialPrompt() throws SQLException {
-        System.out.println("Enter the number of your choice:\n"
+        System.out.println("\nEnter the number of your choice:\n"
          + "1) Login with username/password\n"
          + "2) Create a new account");
         try {
@@ -30,7 +30,7 @@ public class Interface {
                     accountCreation();
                     break;
                 default:
-                    System.out.println("Nubmer entered is not a valid option!");
+                    System.out.println("Number entered is not a valid option!");
                     break;
             }
         }
@@ -59,7 +59,7 @@ public class Interface {
             pst2.setString(2, username);
             pst2.executeUpdate();
 
-            System.out.println("Logged in as " + username + "\n");
+            System.out.println("Logged in as " + username);
             currentUsername = username;
             homeScreen();
         }
@@ -127,7 +127,7 @@ public class Interface {
 
     public void homeScreen() throws SQLException{
         while(true) {
-        System.out.println("Enter the number of your choice:\n"
+        System.out.println("\nEnter the number of your choice:\n"
          + "1) My Collections\n"
          + "2) Search\n"
          + "3) Friends\n"
@@ -139,43 +139,7 @@ public class Interface {
 
             switch (i) {
                 case 1:
-                    while (true) {
-                        System.out.println("1) Create collection\n"
-                        + "2) View all collections\n"
-                        + "3) Add song to collection\n"
-                        + "4) Add album to collection\n"
-                        + "5) Delete song from collection\n"
-                        + "6) Delete album from collection\n"
-                        + "7) Back");
-                        int choice = scanner.nextInt();
-                        scanner.nextLine();
-                        switch (choice) {
-                            case 1:
-                                Collection.createCollection(conn, scanner, currentUsername);
-                                break;
-                            case 2:
-                                Collection.displayAll(conn, scanner, currentUsername);
-                                break;
-                            case 3:
-                                Collection.addSong(conn, scanner, currentUsername);
-                                break;
-                            case 4:
-                                Collection.addAlbum(conn, scanner, currentUsername);
-                                break;
-                            case 5:
-                                Collection.deleteSong(conn, scanner, currentUsername);
-                                break;
-                            case 6:
-                                Collection.deleteAlbum(conn, scanner, currentUsername);
-                                break;
-                            case 7:
-                                break;
-                            default:
-                                System.out.println("Nubmer entered is not a valid option!");
-                                break;
-                        }
-                        break;
-                    }
+                    collection();
                     break;
                 case 2:
                     // all search stuff: by song, by artist, by album, by genre
@@ -202,11 +166,56 @@ public class Interface {
         }
     }
 
+    public void collection() throws SQLException {
+        System.out.println("\nMy Collections:\n"
+        + "1) Create collection\n"
+        + "2) List all collections\n"
+        + "3) View collection\n"
+        + "4) Add song to collection\n"
+        + "5) Add album to collection\n"
+        + "6) Delete song from collection\n"
+        + "7) Delete album from collection\n"
+        + "8) Back");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+        switch (choice) {
+            case 1:
+                Collection.createCollection(conn, scanner, currentUsername);
+                break;
+            case 2:
+                Collection.displayAll(conn, scanner, currentUsername);
+                break;
+            case 3:
+                // view collection...
+                break;
+            case 4:
+                Collection.addSong(conn, scanner, currentUsername);
+                break;
+            case 5:
+                Collection.addAlbum(conn, scanner, currentUsername);
+                break;
+            case 6:
+                Collection.deleteSong(conn, scanner, currentUsername);
+                break;
+            case 7:
+                Collection.deleteAlbum(conn, scanner, currentUsername);
+                break;
+            case 8:
+                return;
+            default:
+                System.out.println("Number entered is not a valid option!");
+                break;
+        }
+    }
+
     /// For listening to a song or an album
     /// User types in name of song or name of album
     /// Each song is added to User-Song relation table
     public void listen() throws SQLException {
-        System.out.println("1) Listen to a song\n" + "2) Listen to an album\n" + "3) Back");
+        System.out.println("\nListen:\n"
+        + "1) Listen to a song\n"
+        + "2) Listen to an album\n"
+        + "3) Back");
         int listen = scanner.nextInt();
         scanner.nextLine();
         switch (listen) {
@@ -221,10 +230,10 @@ public class Interface {
                 Listen.listenAlbum(conn, scanner, albumName);
                 break;
             case 3:
-                break;
+                return;
             default:
                 System.out.println("Number entered is not a valid option!");
-                
+                break;
         }
 
     }
