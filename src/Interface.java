@@ -140,7 +140,7 @@ public class Interface {
             + "2) Search\n"
             + "3) Friends\n"
             + "4) Listen\n"
-            + "5) Quit");
+            + "0) Quit");
 
             int choice;
             try {
@@ -154,6 +154,8 @@ public class Interface {
             }
 
             switch (choice) {
+                case 0:
+                    return;
                 case 1:
                     collection();
                     break;
@@ -168,8 +170,6 @@ public class Interface {
                 case 4:
                     listen();
                     break;
-                case 5:
-                    return;
                 default:
                     System.out.println("Number entered is not a valid option!");
                     break;
@@ -247,7 +247,7 @@ public class Interface {
             System.out.println("\nListen:\n"
             + "1) Listen to a song\n"
             + "2) Listen to an album\n"
-            + "3) Back");
+            + "0) Back");
 
             int listen;
             try {
@@ -261,6 +261,8 @@ public class Interface {
             }
 
             switch (listen) {
+                case 0:
+                    return;
                 case 1:
                     System.out.print("Enter song name: ");
                     String songName = scanner.nextLine();
@@ -271,8 +273,6 @@ public class Interface {
                     String albumName = scanner.nextLine();
                     Listen.listenAlbum(conn, scanner, albumName);
                     break;
-                case 3:
-                    return;
                 default:
                     System.out.println("Number entered is not a valid option!");
                     break;
