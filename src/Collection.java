@@ -4,10 +4,18 @@ import java.util.Scanner;
 
 public class Collection {
 
-    public Collection() {
+    Connection conn;
+    Scanner scanner;
+
+    String username;
+
+    public Collection(Connection conn, Scanner scanner, String username) {
+        this.conn = conn;
+        this.scanner = scanner;
+        this.username = username;
     }
 
-    public static void createCollection(Connection conn, Scanner scanner, String username) throws SQLException {
+    public void createCollection() throws SQLException {
         String playlistName;
         do {
             System.out.print("Name of collection: ");
@@ -29,7 +37,7 @@ public class Collection {
         System.out.println("Collection '" + playlistName + "' has been created!");
     }
 
-    public static void displayAll(Connection conn, Scanner scanner, String username) throws SQLException {
+    public void displayAll() throws SQLException {
         ArrayList<String> collectionNames = new ArrayList<>();
 
         PreparedStatement pst = conn.prepareStatement("SELECT name FROM playlist WHERE username = ?");
@@ -45,7 +53,7 @@ public class Collection {
         }
     }
 
-    public static void renameCollection(Connection conn, Scanner scanner, String username) throws SQLException {
+    public void renameCollection() throws SQLException {
         System.out.print("\nEnter collection name: ");
         String collectionName = scanner.nextLine();
         PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
@@ -78,7 +86,7 @@ public class Collection {
         }
     }
 
-    public static void deleteCollection(Connection conn, Scanner scanner, String username) throws SQLException {
+    public void deleteCollection() throws SQLException {
         System.out.print("\nEnter collection name: ");
         String collectionName = scanner.nextLine();
         PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
@@ -112,7 +120,7 @@ public class Collection {
         }
     }
 
-    public static void addSong(Connection conn, Scanner scanner, String username) throws SQLException {
+    public void addSong() throws SQLException {
         System.out.println("Enter collection name: ");
         String collectionName = scanner.nextLine();
         PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
@@ -149,7 +157,7 @@ public class Collection {
         }
     }
 
-    public static void addAlbum(Connection conn, Scanner scanner, String username) throws SQLException {
+    public void addAlbum() throws SQLException {
         System.out.println("Enter collection name: ");
         String collectionName = scanner.nextLine();
         PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
@@ -197,7 +205,7 @@ public class Collection {
         }
     }
 
-    public static void deleteSong(Connection conn, Scanner scanner, String username) throws SQLException {
+    public void deleteSong() throws SQLException {
         System.out.println("Enter collection name: ");
         String collectionName = scanner.nextLine();
         PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
@@ -231,7 +239,7 @@ public class Collection {
         }
     }
 
-    public static void deleteAlbum(Connection conn, Scanner scanner, String username) throws SQLException {
+    public void deleteAlbum() throws SQLException {
         System.out.println("Enter collection name: ");
         String collectionName = scanner.nextLine();
         PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
@@ -282,8 +290,4 @@ public class Collection {
 
     public void updateCollection() {
     }
-
-    public void deleteCollection() {
-    }
-
 }

@@ -8,6 +8,8 @@ public class Interface {
     Scanner scanner;
 
     String currentUsername;
+
+    Collection myCollections;
     
     public Interface(Connection conn) throws SQLException {
         this.conn = conn;
@@ -81,7 +83,8 @@ public class Interface {
             pst3.executeUpdate();
 
             System.out.println("Logged in as " + username);
-            currentUsername = username;
+            this.currentUsername = username;
+            myCollections = new Collection(conn, scanner, currentUsername);
             homeScreen();
             return;
         }
@@ -141,7 +144,8 @@ public class Interface {
         pst.executeUpdate();
 
         System.out.println("Account '" + newUsername + "' has been created!");
-        currentUsername = newUsername;
+        this.currentUsername = newUsername;
+        myCollections = new Collection(conn, scanner, currentUsername);
         homeScreen();
     }
 
@@ -239,31 +243,31 @@ public class Interface {
                 case 0:
                     return;
                 case 1:
-                    Collection.createCollection(conn, scanner, currentUsername);
+                    myCollections.createCollection();
                     break;
                 case 2:
-                    Collection.displayAll(conn, scanner, currentUsername);
+                    myCollections.displayAll();
                     break;
                 case 3:
                     // view collection...
                     break;
                 case 4:
-                    Collection.renameCollection(conn, scanner, currentUsername);
+                    myCollections.renameCollection();
                     break;
                 case 5:
-                    Collection.deleteCollection(conn, scanner, currentUsername);
+                    myCollections.deleteCollection();
                     break;
                 case 6:
-                    Collection.addSong(conn, scanner, currentUsername);
+                    myCollections.addSong();
                     break;
                 case 7:
-                    Collection.addAlbum(conn, scanner, currentUsername);
+                    myCollections.addAlbum();
                     break;
                 case 8:
-                    Collection.deleteSong(conn, scanner, currentUsername);
+                    myCollections.deleteSong();
                     break;
                 case 9:
-                    Collection.deleteAlbum(conn, scanner, currentUsername);
+                    myCollections.deleteAlbum();
                     break;
                 default:
                     System.out.println("Number entered is not a valid option!");
