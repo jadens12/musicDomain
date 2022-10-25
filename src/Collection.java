@@ -46,6 +46,14 @@ public class Collection {
             System.out.print("Name of collection: ");
             playlistName = scanner.nextLine();
         } while (playlistName.equals(""));
+        PreparedStatement nameQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
+        nameQuery.setString(1, playlistName);
+        nameQuery.setString(2, username);
+        ResultSet nameResult = nameQuery.executeQuery();
+        if (nameResult.next()) {
+            System.out.println("There is already a collection with that name!");
+            return;
+        }
 
         int newID = 0;
         ResultSet rs = conn.createStatement().executeQuery("SELECT MAX(pid) FROM playlist");
