@@ -55,6 +55,11 @@ public class Interface {
             String password = scanner.nextLine();
             String saltValue;
 
+            if (!username.matches("^[a-zA-Z0-9]+$") || !password.matches("^[a-zA-Z0-9]+$")) {
+                System.out.println("Invalid login!");
+                continue;
+            }
+
             PreparedStatement pst = conn.prepareStatement("SELECT salt FROM users WHERE username = ?");
             pst.setString(1, username);
             ResultSet rs = pst.executeQuery();
@@ -94,10 +99,13 @@ public class Interface {
         // check if username taken
         String newUsername;
         while (true) {
-            do {
-                System.out.print("Create a username: ");
-                newUsername = scanner.nextLine();
-            } while (newUsername.equals(""));
+            System.out.print("Create a username: ");
+            newUsername = scanner.nextLine();
+
+            if (!newUsername.matches("^[a-zA-Z0-9]+$")) {
+                System.out.println("Usernames can only contain letters or numbers!");
+                continue;
+            }
 
             PreparedStatement pst = conn.prepareStatement("SELECT * FROM users WHERE username = ?");
             pst.setString(1, newUsername);
@@ -112,10 +120,17 @@ public class Interface {
         }
 
         String newPassword;
-        do {
+        while (true) {
             System.out.print("Create a password: ");
             newPassword = scanner.nextLine();
-        } while (newPassword.equals(""));
+
+            if (!newPassword.matches("^[a-zA-Z0-9]+$")) {
+                System.out.println("Passwords can only contain letters or numbers!");
+                continue;
+            }
+
+            break;
+        }
         String saltValue = getSaltValue();
         int hashPass = (newPassword + saltValue).hashCode();
 
