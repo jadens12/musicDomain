@@ -103,7 +103,7 @@ public class Collection {
             System.out.print("Are you sure you want to delete this collection? (Y/N): ");
             String confirm = scanner.nextLine();
 
-            if (confirm.equals("Y")) {
+            if (confirm.equalsIgnoreCase("Y")) {
                 PreparedStatement collectionDelete = conn.prepareStatement("DELETE FROM playlist WHERE pid = ?");
                 collectionDelete.setInt(1, pid);
                 collectionDelete.executeUpdate();
@@ -111,7 +111,7 @@ public class Collection {
                 System.out.println("Collection deleted!");
                 return;
             }
-            else if (confirm.equals("N")) {
+            else if (confirm.equalsIgnoreCase("N")) {
                 return;
             }
             else {
