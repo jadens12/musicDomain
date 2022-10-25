@@ -51,29 +51,39 @@ public class Interface {
             String username = scanner.nextLine();
             System.out.print("Enter password: ");
             String password = scanner.nextLine();
-            int hashPass = password.hashCode();
+            String saltValue;
 
-            PreparedStatement pst = conn.prepareStatement("SELECT * FROM users WHERE username = ? AND password = ?");
+            PreparedStatement pst = conn.prepareStatement("SELECT salt FROM users WHERE username = ?");
             pst.setString(1, username);
-            pst.setString(2, Integer.toString(hashPass));
             ResultSet rs = pst.executeQuery();
-
             if (!rs.next()) {
                 System.out.println("Incorrect login!");
                 continue;
             }
-            else {
-                java.sql.Date todayDate = new Date(System.currentTimeMillis());
-                PreparedStatement pst2 = conn.prepareStatement("UPDATE users SET last_access_date = ? WHERE username = ?");
-                pst2.setDate(1, todayDate);
-                pst2.setString(2, username);
-                pst2.executeUpdate();
+            
+            saltValue = rs.getString(1);
+            int hashPass = (password + saltValue).hashCode();
 
-                System.out.println("Logged in as " + username);
-                currentUsername = username;
-                homeScreen();
-                return;
+            PreparedStatement pst2 = conn.prepareStatement("SELECT * FROM users WHERE username = ? AND password = ?");
+            pst2.setString(1, username);
+            pst2.setString(2, Integer.toString(hashPass));
+            ResultSet rs2 = pst2.executeQuery();
+
+            if (!rs2.next()) {
+                System.out.println("Incorrect login!");
+                continue;
             }
+            
+            java.sql.Date todayDate = new Date(System.currentTimeMillis());
+            PreparedStatement pst3 = conn.prepareStatement("UPDATE users SET last_access_date = ? WHERE username = ?");
+            pst3.setDate(1, todayDate);
+            pst3.setString(2, username);
+            pst3.executeUpdate();
+
+            System.out.println("Logged in as " + username);
+            currentUsername = username;
+            homeScreen();
+            return;
         }
     }
 
@@ -103,7 +113,8 @@ public class Interface {
             System.out.print("Create a password: ");
             newPassword = scanner.nextLine();
         } while (newPassword.equals(""));
-        int hashPass = newPassword.hashCode();
+        String saltValue = getSaltValue();
+        int hashPass = (newPassword + saltValue).hashCode();
 
         String email;
         do {
@@ -117,7 +128,7 @@ public class Interface {
             name = scanner.nextLine().split(" ", 2);
         } while (name[0].equals("") && name[1].equals(""));
 
-        PreparedStatement pst = conn.prepareStatement("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?)");
+        PreparedStatement pst = conn.prepareStatement("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         pst.setString(1, email);
         pst.setString(2, newUsername);
         pst.setString(3, Integer.toString(hashPass));
@@ -126,11 +137,33 @@ public class Interface {
         java.sql.Date todayDate = new Date(System.currentTimeMillis());
         pst.setDate(6, todayDate);
         pst.setDate(7, todayDate);
+        pst.setString(8, saltValue);
         pst.executeUpdate();
 
         System.out.println("Account '" + newUsername + "' has been created!");
         currentUsername = newUsername;
         homeScreen();
+    }
+
+    public String getSaltValue() {
+        // chose a Character random from this String
+        String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        + "0123456789"
+        + "abcdefghijklmnopqrstuvxyz";
+
+        // create StringBuffer size of 10
+        StringBuilder salt = new StringBuilder(10);
+
+        for (int i = 0; i < 10; i++) {
+            // generate a random number between
+            // 0 to 10 variable length
+            int index = (int) (AlphaNumericString.length() * Math.random());
+
+            // add Character one by one in end of sb
+            salt.append(AlphaNumericString.charAt(index));
+        }
+
+        return salt.toString();
     }
 
     public void homeScreen() throws SQLException{
