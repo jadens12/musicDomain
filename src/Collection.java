@@ -84,24 +84,26 @@ public class Collection {
 
         System.out.println("\nMy collections:");
         for (String name : collectionNames) {
-            System.out.println("-Name" + name);
+            System.out.println("-Collection " + name);
             PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
             collectionQuery.setString(1, name);
             collectionQuery.setString(2, username);
             ResultSet collectionResult = collectionQuery.executeQuery();
+            collectionResult.next();
             
             int pid = collectionResult.getInt("pid");
 
-            PreparedStatement collectionSongQuery = conn.prepareStatement("SELECT sid FROM playlist WHERE pid = ?");
+            PreparedStatement collectionSongQuery = conn.prepareStatement("SELECT sid FROM song_playlist WHERE pid = ?");
             collectionSongQuery.setInt(1, pid);
             ResultSet cResultSet = collectionSongQuery.executeQuery();
             while (cResultSet.next()){
                 int sid = cResultSet.getInt("sid");
                 totalSongs += 1;
-                PreparedStatement collectionDurationQuery = conn.prepareStatement("SELECT duration FROM song WHERE sid = ?");
+                PreparedStatement collectionDurationQuery = conn.prepareStatement("SELECT length FROM song WHERE sid = ?");
                 collectionDurationQuery.setInt(1, sid);
                 ResultSet cResultSet2 = collectionDurationQuery.executeQuery();
-                totalDuration += cResultSet2.getInt("duration");
+                cResultSet2.next();
+                totalDuration += cResultSet2.getInt("length");
             }
             System.out.println("-Total songs: " + totalSongs);
             System.out.println("-Total duration: " + totalDuration);
