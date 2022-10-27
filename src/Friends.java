@@ -5,60 +5,78 @@ import java.util.Scanner;
 public class Friends {
 
     public static void followFriend(Connection conn, Scanner scanner, String username) throws SQLException {
-        System.out.println("Please enter the email of the user you would like to follow.");
-        String friendEmail = scanner.next();
-        scanner.nextLine();
-        boolean matches = friendEmail.matches(Interface.emailRegex);
-        if (matches)
-        {
-            String friendUsername = getFriendUsername(conn, friendEmail);
-            if (friendUsername !="")
+        String friendEmail;
+        while (true) {
+            System.out.print("Please enter the email of the user you would like to follow: ");
+            friendEmail = scanner.nextLine();
+
+            if (!friendEmail.matches(Interface.emailRegex))
             {
-                PreparedStatement addFollow = conn.prepareStatement("INSERT INTO user_user VALUES (?, ?)");
-                addFollow.setString(1, username);
-                addFollow.setString(2, friendUsername);
-                addFollow.executeUpdate();
-                System.out.println("Friend " + friendUsername + " followed!\n");
-            }
-            else
-            {
-                System.out.println("User not found!\n");
+                System.out.println("Invalid email format!");
+                continue;
             }
 
+            break;
+        }
 
-        }
-        else
+        String friendUsername = getFriendUsername(conn, friendEmail);
+        if (friendUsername == "")
         {
-            System.out.println("Invalid email format.\n");
+            System.out.println("User not found!");
+            return;
         }
+
+        PreparedStatement checkFollowing = conn.prepareStatement("SELECT username1 FROM user_user WHERE username1 = ? AND username2 = ?");
+        checkFollowing.setString(1, username);
+        checkFollowing.setString(2, friendUsername);
+        ResultSet rs = checkFollowing.executeQuery();
+        if (rs.next()) {
+            System.out.println("Already following " + friendUsername + "!");
+            return;
+        }
+
+        PreparedStatement addFollow = conn.prepareStatement("INSERT INTO user_user VALUES (?, ?)");
+        addFollow.setString(1, username);
+        addFollow.setString(2, friendUsername);
+        addFollow.executeUpdate();
+        System.out.println("Friend " + friendUsername + " followed!");
     }
 
     public static void unfollowFriend(Connection conn, Scanner scanner, String username) throws SQLException {
-        System.out.println("Please enter the email of the user you would like to unfollow.");
-        String friendEmail = scanner.next();
-        scanner.nextLine();
-        boolean matches = friendEmail.matches(Interface.emailRegex);
-        if (matches)
-        {
-            String friendUsername = getFriendUsername(conn, friendEmail);
-            if (friendUsername != "")
+        String friendEmail;
+        while (true) {
+            System.out.print("Please enter the email of the user you would like to unfollow: ");
+            friendEmail = scanner.nextLine();
+
+            if (!friendEmail.matches(Interface.emailRegex))
             {
-                PreparedStatement unfollowFriend = conn.prepareStatement("DELETE FROM user_user WHERE (?,?");
-                unfollowFriend.setString(1, username);
-                unfollowFriend.setString(2, friendUsername);
-                unfollowFriend.executeUpdate();
-                System.out.println("Friend unfollowed.\n");
+                System.out.println("Invalid email format.");
+                continue;
             }
-            else
-            {
-                System.out.println("Friend not found!\n");
-            }
-        }
-        else
-        {
-            System.out.println("Invalid email format.\n");
+
+            break;
         }
 
+        String friendUsername = getFriendUsername(conn, friendEmail);
+        if (friendUsername == "") {
+            System.out.println("Friend not found!");
+            return;
+        }
+
+        PreparedStatement checkFollowing = conn.prepareStatement("SELECT username1 FROM user_user WHERE username1 = ? AND username2 = ?");
+        checkFollowing.setString(1, username);
+        checkFollowing.setString(2, friendUsername);
+        ResultSet rs = checkFollowing.executeQuery();
+        if (!rs.next()) {
+            System.out.println("No such friend with email '" + friendEmail + "'!");
+            return;
+        }
+        
+        PreparedStatement unfollowFriend = conn.prepareStatement("DELETE FROM user_user WHERE username1 = ? AND username2 = ?");
+        unfollowFriend.setString(1, username);
+        unfollowFriend.setString(2, friendUsername);
+        unfollowFriend.executeUpdate();
+        System.out.println("Friend " + friendUsername + " unfollowed.");
     }
 
     public static void viewFriends(Connection conn, Scanner scanner, String username) throws SQLException
