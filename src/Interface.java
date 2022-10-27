@@ -1,9 +1,12 @@
 import java.sql.*;
-import java.util.Scanner; 
+import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.InputMismatchException;
 
 public class Interface {
 
+    final static String emailRegex = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
+    
     Connection conn;
     Scanner scanner;
 
@@ -72,7 +75,7 @@ public class Interface {
             saltValue = rs.getString(1);
             int hashPass = (password + saltValue).hashCode();
 
-            PreparedStatement pst2 = conn.prepareStatement("SELECT * FROM users WHERE username = ? AND password = ?");
+            PreparedStatement pst2 = conn.prepareStatement("SELECT username FROM users WHERE username = ? AND password = ?");
             pst2.setString(1, username);
             pst2.setString(2, Integer.toString(hashPass));
             ResultSet rs2 = pst2.executeQuery();
@@ -109,7 +112,7 @@ public class Interface {
                 continue;
             }
 
-            PreparedStatement pst = conn.prepareStatement("SELECT * FROM users WHERE username = ?");
+            PreparedStatement pst = conn.prepareStatement("SELECT username FROM users WHERE username = ?");
             pst.setString(1, newUsername);
             ResultSet rs = pst.executeQuery();
 
@@ -136,11 +139,28 @@ public class Interface {
         String saltValue = getSaltValue();
         int hashPass = (newPassword + saltValue).hashCode();
 
+        // check if email taken
         String email;
-        do {
+        while (true) {
             System.out.print("Enter your email: ");
             email = scanner.nextLine();
-        } while (email.equals(""));
+
+            if (!email.matches(emailRegex)) {
+                System.out.println("Please enter a valid email!");
+                continue;
+            }
+
+            PreparedStatement pst = conn.prepareStatement("SELECT username FROM users WHERE email = ?");
+            pst.setString(1, email);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                System.out.println("Email already associated with another user!");
+            }
+            else {
+                break;
+            }
+        }
 
         String name[] = new String[2];
         do {
@@ -237,13 +257,12 @@ public class Interface {
             System.out.println("\nMy Collections:\n"
             + "1) Create collection\n"
             + "2) List all collections\n"
-            + "3) View collection\n"
-            + "4) Rename collection\n"
-            + "5) Delete collection\n"
-            + "6) Add song to collection\n"
-            + "7) Add album to collection\n"
-            + "8) Delete song from collection\n"
-            + "9) Delete album from collection\n"
+            + "3) Rename collection\n"
+            + "4) Delete collection\n"
+            + "5) Add song to collection\n"
+            + "6) Add album to collection\n"
+            + "7) Delete song from collection\n"
+            + "8) Delete album from collection\n"
             + "0) Back");
 
             int choice;
@@ -267,24 +286,21 @@ public class Interface {
                     myCollections.displayAll();
                     break;
                 case 3:
-                    // view collection...
-                    break;
-                case 4:
                     myCollections.renameCollection();
                     break;
-                case 5:
+                case 4:
                     myCollections.deleteCollection();
                     break;
-                case 6:
+                case 5:
                     myCollections.addSong();
                     break;
-                case 7:
+                case 6:
                     myCollections.addAlbum();
                     break;
-                case 8:
+                case 7:
                     myCollections.deleteSong();
                     break;
-                case 9:
+                case 8:
                     myCollections.deleteAlbum();
                     break;
                 default:
@@ -335,112 +351,41 @@ public class Interface {
         }
     }
     public void friendMenu() throws SQLException {
-        boolean wantsHome = false;
-        while (wantsHome == false)
+        while (true)
         {
-            System.out.println("Please make a selection: ");
-            System.out.println("1) Follow a Friend\t 2) Unfollow a friend");
-            System.out.println("3) View Friends\t 4) Return home");
-            int selection = Integer.parseInt(scanner.next());
-            scanner.nextLine();
-            if (selection == 1)
-            {
-                followFriend();
+            System.out.println("\nFriends: \n"
+            + "1) Follow a Friend\n"
+            + "2) Unfollow a Friend\n"
+            + "3) View Friends\n"
+            + "0) Back");
 
+            int selection;
+            try {
+                selection = scanner.nextInt();
+                scanner.nextLine();
+            } catch (Exception e) {
+                System.out.println("Please enter a number.");
+                scanner.next();
+                continue;
             }
-            else if (selection == 2)
-            {
-                unfollowFriend();
-            }
-            else if (selection == 3)
-            {
-                viewFriends();
-            }
-            else if (selection == 4)
-            {
-                wantsHome = true;
-            }
-            else {
-                System.out.println("Invalid input detected.");
+
+            switch (selection) {
+                case 0:
+                    return;
+                case 1:
+                    Friends.followFriend(conn, scanner, this.currentUsername);
+                    break;
+                case 2:
+                    Friends.unfollowFriend(conn, scanner, this.currentUsername);
+                    break;
+                case 3:
+                    Friends.viewFriends(conn, scanner, this.currentUsername);
+                    break;
+                default:
+                    System.out.println("Number entered is not a valid option!");
+                    break;
             }
         }
-        homeScreen();
-    }
-    public void followFriend() throws SQLException {
-        String regex = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
-        System.out.println("Please enter the email of the user you would like to follow.");
-        String friendEmail = scanner.next();
-        scanner.nextLine();
-        boolean matches = friendEmail.matches(regex);
-        if (matches)
-        {
-            String currentEmail = this.getCurrentUserEmail();
-
-            if (currentEmail != "")
-            {
-                PreparedStatement addFollow = conn.prepareStatement("INSERT INTO user_user VALUES (?, ?)");
-                addFollow.setString(1, currentEmail);
-                addFollow.setString(2, friendEmail);
-                addFollow.executeUpdate();
-                System.out.println("Friend " + friendEmail + " followed!\n");
-            }
-        }
-        else
-        {
-            System.out.println("Invalid email format.\n");
-        }
-    }
-
-    public void unfollowFriend() throws SQLException {
-        String regex = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
-        System.out.println("Please enter the email of the user you would like to unfollow.");
-        String friendEmail = scanner.next();
-        scanner.nextLine();
-        boolean matches = friendEmail.matches(regex);
-        if (matches)
-        {
-            String currentEmail = this.getCurrentUserEmail();
-
-            if (currentEmail != "")
-            {
-                PreparedStatement unfollowFriend = conn.prepareStatement("DELETE FROM user_user WHERE (?,?");
-                unfollowFriend.setString(1, currentEmail);
-                unfollowFriend.setString(2, friendEmail);
-                unfollowFriend.executeUpdate();
-                System.out.println("Friend unfollowed.\n");
-            }
-            else
-            {
-                System.out.println("current user email invalid\n");
-            }
-        }
-        else
-        {
-            System.out.println("Invalid email format.\n");
-        }
-
-    }
-
-    public void viewFriends() throws SQLException
-    {
-        String currentEmail = this.getCurrentUserEmail();
-        if (currentEmail != "")
-        {
-            PreparedStatement viewFollowed = conn.prepareStatement("SELECT username2 FROM user_user WHERE username1 = ?");
-            viewFollowed.setString(1, currentEmail);
-            ResultSet rs = viewFollowed.executeQuery();
-
-            while (rs.next())
-            {
-                System.out.println(rs.getString("username2"));
-            }
-            System.out.println("\n");
-        }
-        else
-        {
-            System.out.println("current user email invalid\n");
-        }
-
     }
 
     public String getCurrentUserEmail() throws SQLException
@@ -456,7 +401,7 @@ public class Interface {
         }
         return currentEmail;
     }
-
+    
     public void search() throws SQLException{
 
         while(true){
