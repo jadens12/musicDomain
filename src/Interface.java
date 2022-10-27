@@ -5,7 +5,7 @@ import java.util.InputMismatchException;
 
 public class Interface {
 
-    final String emailRegex = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
+    final static String emailRegex = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
     
     Connection conn;
     Scanner scanner;
@@ -348,139 +348,41 @@ public class Interface {
         }
     }
     public void friendMenu() throws SQLException {
-        boolean wantsHome = false;
-        while (wantsHome == false)
+        while (true)
         {
-            System.out.println("Please make a selection: ");
-            System.out.println("1) Follow a Friend\t 2) Unfollow a friend");
-            System.out.println("3) View Friends\t 4) Return home");
-            int selection = Integer.parseInt(scanner.next());
-            scanner.nextLine();
-            if (selection == 1)
-            {
-                followFriend();
+            System.out.println("\nFriends: \n"
+            + "1) Follow a Friend\n"
+            + "2) Unfollow a Friend\n"
+            + "3) View Friends\n"
+            + "0) Back");
 
-            }
-            else if (selection == 2)
-            {
-                unfollowFriend();
-            }
-            else if (selection == 3)
-            {
-                viewFriends();
-            }
-            else if (selection == 4)
-            {
-                wantsHome = true;
-            }
-            else {
-                System.out.println("Invalid input detected.");
-            }
-        }
-        homeScreen();
-    }
-    public void followFriend() throws SQLException {
-        System.out.println("Please enter the email of the user you would like to follow.");
-        String friendEmail = scanner.next();
-        scanner.nextLine();
-        boolean matches = friendEmail.matches(emailRegex);
-        if (matches)
-        {
-            String friendUsername = getFriendUsername(friendEmail);
-            if (friendUsername !="")
-            {
-                PreparedStatement addFollow = conn.prepareStatement("INSERT INTO user_user VALUES (?, ?)");
-                addFollow.setString(1, this.currentUsername);
-                addFollow.setString(2, friendEmail);
-                addFollow.executeUpdate();
-                System.out.println("Friend " + friendEmail + " followed!\n");
-            }
-            else
-            {
-                System.out.println("User not found!\n");
+            int selection;
+            try {
+                selection = scanner.nextInt();
+                scanner.nextLine();
+            } catch (Exception e) {
+                System.out.println("Please enter a number.");
+                scanner.next();
+                continue;
             }
 
-
-        }
-        else
-        {
-            System.out.println("Invalid email format.\n");
+            switch (selection) {
+                case 0:
+                    return;
+                case 1:
+                    Friends.followFriend(conn, scanner, this.currentUsername);
+                    break;
+                case 2:
+                    Friends.unfollowFriend(conn, scanner, this.currentUsername);
+                    break;
+                case 3:
+                    Friends.viewFriends(conn, scanner, this.currentUsername);
+                    break;
+                default:
+                    System.out.println("Number entered is not a valid option!");
+                    break;
+            }
         }
     }
-
-    public void unfollowFriend() throws SQLException {
-        System.out.println("Please enter the email of the user you would like to unfollow.");
-        String friendEmail = scanner.next();
-        scanner.nextLine();
-        boolean matches = friendEmail.matches(emailRegex);
-        if (matches)
-        {
-            String friendUsername = getFriendUsername(friendEmail);
-            if (friendUsername != "")
-            {
-                PreparedStatement unfollowFriend = conn.prepareStatement("DELETE FROM user_user WHERE (?,?");
-                unfollowFriend.setString(1, this.currentUsername);
-                unfollowFriend.setString(2, friendUsername);
-                unfollowFriend.executeUpdate();
-                System.out.println("Friend unfollowed.\n");
-            }
-            else
-            {
-                System.out.println("Friend not found!\n");
-            }
-        }
-        else
-        {
-            System.out.println("Invalid email format.\n");
-        }
-
-    }
-
-    public void viewFriends() throws SQLException
-    {
-        if (this.currentUsername != "")
-        {
-            ArrayList<String> friendNames = new ArrayList<>();
-            PreparedStatement viewFollowed = conn.prepareStatement("SELECT username2 FROM user_user WHERE username1 = ?");
-            viewFollowed.setString(1, currentUsername);
-            ResultSet rs = viewFollowed.executeQuery();
-
-            while (rs.next())
-            {
-                friendNames.add(rs.getString("username2"));
-            }
-            for (String username : friendNames)
-            {
-                PreparedStatement getFriendEmail = conn.prepareStatement("SELECT username FROM user WHERE email = ?");
-                getFriendEmail.setString(1, username);
-                ResultSet emails = getFriendEmail.executeQuery();
-                while (emails.next())
-                {
-                    System.out.println(rs.getString("email"));
-                }
-            }
-            System.out.println("\n");
-        }
-        else
-        {
-            System.out.println("current user email invalid\n");
-        }
-
-    }
-
-    public String getFriendUsername(String email) throws SQLException {
-        PreparedStatement getFriendEmail = conn.prepareStatement("SELECT username FROM users WHERE email = ?");
-        getFriendEmail.setString(1, email);
-        ResultSet rs = getFriendEmail.executeQuery();
-        String friendUsername = "";
-        while (rs.next())
-        {
-            friendUsername = rs.getString("username");
-        }
-        if (friendUsername != "")
-        {
-            return friendUsername;
-        }
-        else return "";
-    }
+    
 }
