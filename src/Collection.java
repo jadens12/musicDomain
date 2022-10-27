@@ -6,7 +6,6 @@ public class Collection {
 
     Connection conn;
     Scanner scanner;
-
     String username;
 
     public Collection(Connection conn, Scanner scanner, String username) {
@@ -15,12 +14,46 @@ public class Collection {
         this.username = username;
     }
 
+    private class CollectionInfo{
+        public String name;
+        public int pid;
+
+        public CollectionInfo(String name, int pid){
+            this.name = name;
+            this.pid = pid;
+        }
+    }
+
+    private CollectionInfo getCollection() throws SQLException{
+        System.out.print("\nEnter collection name: ");
+        String collectionName = scanner.nextLine();
+        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
+        collectionQuery.setString(1, collectionName);
+        collectionQuery.setString(2, username);
+        ResultSet collectionResult = collectionQuery.executeQuery();
+        if (!collectionResult.next()) {
+            System.out.println("Collection not found.");
+            return null;
+        }
+        int pid = collectionResult.getInt("pid");
+        CollectionInfo collection = new CollectionInfo(collectionName, pid);
+        return collection;
+    }
+
     public void createCollection() throws SQLException {
         String playlistName;
         do {
             System.out.print("Name of collection: ");
             playlistName = scanner.nextLine();
         } while (playlistName.equals(""));
+        PreparedStatement nameQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
+        nameQuery.setString(1, playlistName);
+        nameQuery.setString(2, username);
+        ResultSet nameResult = nameQuery.executeQuery();
+        if (nameResult.next()) {
+            System.out.println("There is already a collection with that name!");
+            return;
+        }
 
         int newID = 0;
         ResultSet rs = conn.createStatement().executeQuery("SELECT MAX(pid) FROM playlist");
@@ -76,17 +109,8 @@ public class Collection {
     }
 
     public void renameCollection() throws SQLException {
-        System.out.print("\nEnter collection name: ");
-        String collectionName = scanner.nextLine();
-        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
-        collectionQuery.setString(1, collectionName);
-        collectionQuery.setString(2, username);
-        ResultSet collectionResult = collectionQuery.executeQuery();
-        if (!collectionResult.next()) {
-            System.out.println("Collection not found.");
-            return;
-        }
-        int pid = collectionResult.getInt("pid");
+        CollectionInfo collection = getCollection();
+        if(collection == null) return;
 
         System.out.print("Enter new name: ");
         String newName = scanner.nextLine();
@@ -101,25 +125,16 @@ public class Collection {
         else {
             PreparedStatement cNameUpdate = conn.prepareStatement("UPDATE playlist SET name = ? WHERE pid = ?");
             cNameUpdate.setString(1, newName);
-            cNameUpdate.setInt(2, pid);
+            cNameUpdate.setInt(2, collection.pid);
             cNameUpdate.executeUpdate();
 
-            System.out.print("Collection renamed!");
+            System.out.print("Collection " + collection.name + " renamed to " + nameResult + "!");
         }
     }
 
     public void deleteCollection() throws SQLException {
-        System.out.print("\nEnter collection name: ");
-        String collectionName = scanner.nextLine();
-        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
-        collectionQuery.setString(1, collectionName);
-        collectionQuery.setString(2, username);
-        ResultSet collectionResult = collectionQuery.executeQuery();
-        if (!collectionResult.next()) {
-            System.out.println("Collection not found.");
-            return;
-        }
-        int pid = collectionResult.getInt("pid");
+        CollectionInfo collection = getCollection();
+        if(collection == null) return;
 
         while (true) {
             System.out.print("Are you sure you want to delete this collection? (Y/N): ");
@@ -127,10 +142,10 @@ public class Collection {
 
             if (confirm.equalsIgnoreCase("Y")) {
                 PreparedStatement collectionDelete = conn.prepareStatement("DELETE FROM playlist WHERE pid = ?");
-                collectionDelete.setInt(1, pid);
+                collectionDelete.setInt(1, collection.pid);
                 collectionDelete.executeUpdate();
 
-                System.out.println("Collection deleted!");
+                System.out.println("Collection " + collection.name + " deleted!");
                 return;
             }
             else if (confirm.equalsIgnoreCase("N")) {
@@ -143,17 +158,8 @@ public class Collection {
     }
 
     public void addSong() throws SQLException {
-        System.out.println("Enter collection name: ");
-        String collectionName = scanner.nextLine();
-        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
-        collectionQuery.setString(1, collectionName);
-        collectionQuery.setString(2, username);
-        ResultSet collectionResult = collectionQuery.executeQuery();
-        if (!collectionResult.next()) {
-            System.out.println("Collection not found.");
-            return;
-        }
-        int pid = collectionResult.getInt("pid");
+        CollectionInfo collection = getCollection();
+        if(collection == null) return;
 
         System.out.println("Enter song name: ");
         String songName = scanner.nextLine();
@@ -169,28 +175,19 @@ public class Collection {
         PreparedStatement insertQuery = conn.prepareStatement("INSERT INTO song_playlist (sid, pid) "
                 + "SELECT ?, ? WHERE NOT EXISTS (SELECT * FROM song_playlist WHERE sid = ? and pid = ?)");
         insertQuery.setInt(1, sid);
-        insertQuery.setInt(2, pid);
+        insertQuery.setInt(2, collection.pid);
         insertQuery.setInt(3, sid);
-        insertQuery.setInt(4, pid);
+        insertQuery.setInt(4, collection.pid);
         if (insertQuery.executeUpdate() == 1) {
-            System.out.println(songName + " successfully added to " + collectionName + "!");
+            System.out.println(songName + " successfully added to " + collection.name + "!");
         } else {
-            System.out.println(songName + " already in " + collectionName);
+            System.out.println(songName + " already in " + collection.name);
         }
     }
 
     public void addAlbum() throws SQLException {
-        System.out.println("Enter collection name: ");
-        String collectionName = scanner.nextLine();
-        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
-        collectionQuery.setString(1, collectionName);
-        collectionQuery.setString(2, username);
-        ResultSet collectionResult = collectionQuery.executeQuery();
-        if (!collectionResult.next()) {
-            System.out.println("Collection not found.");
-            return;
-        }
-        int pid = collectionResult.getInt("pid");
+        CollectionInfo collection = getCollection();
+        if(collection == null) return;
 
         System.out.println("Enter album name: ");
         String albumName = scanner.nextLine();
@@ -216,29 +213,20 @@ public class Collection {
             PreparedStatement insertQuery = conn.prepareStatement("INSERT INTO song_playlist (sid, pid) "
                     + "SELECT ?, ? WHERE NOT EXISTS (SELECT * FROM song_playlist WHERE sid = ? and pid = ?)");
             insertQuery.setInt(1, sid);
-            insertQuery.setInt(2, pid);
+            insertQuery.setInt(2, collection.pid);
             insertQuery.setInt(3, sid);
-            insertQuery.setInt(4, pid);
+            insertQuery.setInt(4, collection.pid);
             if (insertQuery.executeUpdate() == 1) {
-                System.out.println(songName + " successfully added to " + collectionName + "!");
+                System.out.println(songName + " successfully added to " + collection.name + "!");
             } else {
-                System.out.println(songName + " already in " + collectionName);
+                System.out.println(songName + " already in " + collection.name);
             }
         }
     }
 
     public void deleteSong() throws SQLException {
-        System.out.println("Enter collection name: ");
-        String collectionName = scanner.nextLine();
-        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
-        collectionQuery.setString(1, collectionName);
-        collectionQuery.setString(2, username);
-        ResultSet collectionResult = collectionQuery.executeQuery();
-        if (!collectionResult.next()) {
-            System.out.println("Collection not found.");
-            return;
-        }
-        int pid = collectionResult.getInt("pid");
+        CollectionInfo collection = getCollection();
+        if(collection == null) return;
 
         System.out.println("Enter song name: ");
         String songName = scanner.nextLine();
@@ -253,26 +241,17 @@ public class Collection {
 
         PreparedStatement deleteSongQuery = conn.prepareStatement("DELETE FROM song_playlist WHERE sid = ? and pid = ?");
         deleteSongQuery.setInt(1, sid);
-        deleteSongQuery.setInt(2, pid);
+        deleteSongQuery.setInt(2, collection.pid);
         if (deleteSongQuery.executeUpdate() == 1) {
-            System.out.println(songName + " successfully deleted from " + collectionName + "!");
+            System.out.println(songName + " successfully deleted from " + collection.name + "!");
         } else {
-            System.out.println(songName + " not in " + collectionName);
+            System.out.println(songName + " not in " + collection.name);
         }
     }
 
     public void deleteAlbum() throws SQLException {
-        System.out.println("Enter collection name: ");
-        String collectionName = scanner.nextLine();
-        PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
-        collectionQuery.setString(1, collectionName);
-        collectionQuery.setString(2, username);
-        ResultSet collectionResult = collectionQuery.executeQuery();
-        if (!collectionResult.next()) {
-            System.out.println("Collection not found.");
-            return;
-        }
-        int pid = collectionResult.getInt("pid");
+        CollectionInfo collection = getCollection();
+        if(collection == null) return;
 
         System.out.println("Enter album name: ");
         String albumName = scanner.nextLine();
@@ -298,16 +277,13 @@ public class Collection {
 
             PreparedStatement deleteQuery = conn.prepareStatement("DELETE FROM song_playlist WHERE sid = ? and pid = ?");
             deleteQuery.setInt(1, sid);
-            deleteQuery.setInt(2, pid);
+            deleteQuery.setInt(2, collection.pid);
             if (deleteQuery.executeUpdate() == 1) {
-                System.out.println(songName + " successfully deleted from " + collectionName + "!");
+                System.out.println(songName + " successfully deleted from " + collection.name + "!");
             } else {
-                System.out.println(songName + " not in " + collectionName);
+                System.out.println(songName + " not in " + collection.name);
             }
         }
-    }
-
-    public void getCollection() {
     }
 
     public void updateCollection() {
