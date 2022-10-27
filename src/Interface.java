@@ -234,13 +234,12 @@ public class Interface {
             System.out.println("\nMy Collections:\n"
             + "1) Create collection\n"
             + "2) List all collections\n"
-            + "3) View collection\n"
-            + "4) Rename collection\n"
-            + "5) Delete collection\n"
-            + "6) Add song to collection\n"
-            + "7) Add album to collection\n"
-            + "8) Delete song from collection\n"
-            + "9) Delete album from collection\n"
+            + "3) Rename collection\n"
+            + "4) Delete collection\n"
+            + "5) Add song to collection\n"
+            + "6) Add album to collection\n"
+            + "7) Delete song from collection\n"
+            + "8) Delete album from collection\n"
             + "0) Back");
 
             int choice;
@@ -264,24 +263,21 @@ public class Interface {
                     myCollections.displayAll();
                     break;
                 case 3:
-                    // view collection...
-                    break;
-                case 4:
                     myCollections.renameCollection();
                     break;
-                case 5:
+                case 4:
                     myCollections.deleteCollection();
                     break;
-                case 6:
+                case 5:
                     myCollections.addSong();
                     break;
-                case 7:
+                case 6:
                     myCollections.addAlbum();
                     break;
-                case 8:
+                case 7:
                     myCollections.deleteSong();
                     break;
-                case 9:
+                case 8:
                     myCollections.deleteAlbum();
                     break;
                 default:
