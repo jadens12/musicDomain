@@ -10,6 +10,7 @@ public class Interface {
     String currentUsername;
 
     Collection myCollections;
+    Search search;
     
     public Interface(Connection conn) throws SQLException {
         this.conn = conn;
@@ -90,6 +91,7 @@ public class Interface {
             System.out.println("Logged in as " + username);
             this.currentUsername = username;
             myCollections = new Collection(conn, scanner, currentUsername);
+            search = new Search(conn, scanner);
             homeScreen();
             return;
         }
@@ -215,6 +217,7 @@ public class Interface {
                     // all search stuff: by song, by artist, by album, by genre
                     // allow users to add song or album to collection?
                     // also allow user to play song? i guess? not sure...
+                    search();
                     break;
                 case 3:
                     friendMenu();
@@ -452,5 +455,46 @@ public class Interface {
             currentEmail = rs.getString("email");
         }
         return currentEmail;
+    }
+
+    public void search() throws SQLException{
+
+        while(true){
+            System.out.println("Enter a number of your choice: \n" +
+            "1) Search by song name \n" +
+            "2) Search by artist name \n" + 
+            "3) Search by album name \n" + 
+            "4) Search by genre");
+
+            int choice;
+            try {
+                choice = scanner.nextInt();
+                scanner.nextLine();
+            }
+            catch (InputMismatchException e) {
+                System.out.println("Please enter a number.");
+                scanner.next();
+                continue;
+            }   
+            switch (choice) {
+                case 0:
+                    return;
+                case 1:
+                    search.searchByName();
+                    break;
+                case 2:
+                    search.searchbyArtist();
+                    break;
+                case 3:
+                    search.searchbyAlbum();
+                    break;
+                case 4:
+                    search.searchbyGenre();
+                    break;
+                default:
+                    System.out.println("Number entered is not a valid option!");
+                    break;
+            }
+        }
     }
 }
