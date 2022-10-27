@@ -1,5 +1,7 @@
+import javax.xml.transform.Result;
 import java.sql.*;
-import java.util.Scanner; 
+import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.InputMismatchException;
 
 public class Interface {
@@ -364,6 +366,7 @@ public class Interface {
         homeScreen();
     }
     public void followFriend() throws SQLException {
+
         String regex = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
         System.out.println("Please enter the email of the user you would like to follow.");
         String friendEmail = scanner.next();
@@ -371,16 +374,21 @@ public class Interface {
         boolean matches = friendEmail.matches(regex);
         if (matches)
         {
-            String currentEmail = this.getCurrentUserEmail();
-
-            if (currentEmail != "")
+            String friendUsername = getFriendUsername(friendEmail);
+            if (friendUsername !="")
             {
                 PreparedStatement addFollow = conn.prepareStatement("INSERT INTO user_user VALUES (?, ?)");
-                addFollow.setString(1, currentEmail);
+                addFollow.setString(1, this.currentUsername);
                 addFollow.setString(2, friendEmail);
                 addFollow.executeUpdate();
                 System.out.println("Friend " + friendEmail + " followed!\n");
             }
+            else
+            {
+                System.out.println("User not found!\n");
+            }
+
+
         }
         else
         {
@@ -396,19 +404,18 @@ public class Interface {
         boolean matches = friendEmail.matches(regex);
         if (matches)
         {
-            String currentEmail = this.getCurrentUserEmail();
-
-            if (currentEmail != "")
+            String friendUsername = getFriendUsername(friendEmail);
+            if (friendUsername != "")
             {
                 PreparedStatement unfollowFriend = conn.prepareStatement("DELETE FROM user_user WHERE (?,?");
-                unfollowFriend.setString(1, currentEmail);
-                unfollowFriend.setString(2, friendEmail);
+                unfollowFriend.setString(1, this.currentUsername);
+                unfollowFriend.setString(2, friendUsername);
                 unfollowFriend.executeUpdate();
                 System.out.println("Friend unfollowed.\n");
             }
             else
             {
-                System.out.println("current user email invalid\n");
+                System.out.println("Friend not found!\n");
             }
         }
         else
@@ -420,16 +427,26 @@ public class Interface {
 
     public void viewFriends() throws SQLException
     {
-        String currentEmail = this.getCurrentUserEmail();
-        if (currentEmail != "")
+        if (this.currentUsername != "")
         {
+            ArrayList<String> friendNames = new ArrayList<>();
             PreparedStatement viewFollowed = conn.prepareStatement("SELECT username2 FROM user_user WHERE username1 = ?");
-            viewFollowed.setString(1, currentEmail);
+            viewFollowed.setString(1, currentUsername);
             ResultSet rs = viewFollowed.executeQuery();
 
             while (rs.next())
             {
-                System.out.println(rs.getString("username2"));
+                friendNames.add(rs.getString("username2"));
+            }
+            for (String username : friendNames)
+            {
+                PreparedStatement getFriendEmail = conn.prepareStatement("SELECT username FROM user WHERE email = ?");
+                getFriendEmail.setString(1, username);
+                ResultSet emails = getFriendEmail.executeQuery();
+                while (emails.next())
+                {
+                    System.out.println(rs.getString("email"));
+                }
             }
             System.out.println("\n");
         }
@@ -440,17 +457,19 @@ public class Interface {
 
     }
 
-    public String getCurrentUserEmail() throws SQLException
-    {
-        PreparedStatement getUser = conn.prepareStatement("SELECT email FROM users WHERE username = ?");
-        getUser.setString(1, this.currentUsername);
-        ResultSet rs = getUser.executeQuery();
-
-        String currentEmail ="";
-        while(rs.next())
+    public String getFriendUsername(String email) throws SQLException {
+        PreparedStatement getFriendEmail = conn.prepareStatement("SELECT username FROM users WHERE email = ?");
+        getFriendEmail.setString(1, email);
+        ResultSet rs = getFriendEmail.executeQuery();
+        String friendUsername = "";
+        while (rs.next())
         {
-            currentEmail = rs.getString("email");
+            friendUsername = rs.getString("username");
         }
-        return currentEmail;
+        if (friendUsername != "")
+        {
+            return friendUsername;
+        }
+        else return "";
     }
 }
