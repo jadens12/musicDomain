@@ -1,4 +1,3 @@
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -6,6 +5,8 @@ import java.util.InputMismatchException;
 
 public class Interface {
 
+    final String emailRegex = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
+    
     Connection conn;
     Scanner scanner;
 
@@ -73,7 +74,7 @@ public class Interface {
             saltValue = rs.getString(1);
             int hashPass = (password + saltValue).hashCode();
 
-            PreparedStatement pst2 = conn.prepareStatement("SELECT * FROM users WHERE username = ? AND password = ?");
+            PreparedStatement pst2 = conn.prepareStatement("SELECT username FROM users WHERE username = ? AND password = ?");
             pst2.setString(1, username);
             pst2.setString(2, Integer.toString(hashPass));
             ResultSet rs2 = pst2.executeQuery();
@@ -109,7 +110,7 @@ public class Interface {
                 continue;
             }
 
-            PreparedStatement pst = conn.prepareStatement("SELECT * FROM users WHERE username = ?");
+            PreparedStatement pst = conn.prepareStatement("SELECT username FROM users WHERE username = ?");
             pst.setString(1, newUsername);
             ResultSet rs = pst.executeQuery();
 
@@ -136,11 +137,28 @@ public class Interface {
         String saltValue = getSaltValue();
         int hashPass = (newPassword + saltValue).hashCode();
 
+        // check if email taken
         String email;
-        do {
+        while (true) {
             System.out.print("Enter your email: ");
             email = scanner.nextLine();
-        } while (email.equals(""));
+
+            if (!email.matches(emailRegex)) {
+                System.out.println("Please enter a valid email!");
+                continue;
+            }
+
+            PreparedStatement pst = conn.prepareStatement("SELECT username FROM users WHERE email = ?");
+            pst.setString(1, email);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                System.out.println("Email already associated with another user!");
+            }
+            else {
+                break;
+            }
+        }
 
         String name[] = new String[2];
         do {
@@ -362,12 +380,10 @@ public class Interface {
         homeScreen();
     }
     public void followFriend() throws SQLException {
-
-        String regex = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
         System.out.println("Please enter the email of the user you would like to follow.");
         String friendEmail = scanner.next();
         scanner.nextLine();
-        boolean matches = friendEmail.matches(regex);
+        boolean matches = friendEmail.matches(emailRegex);
         if (matches)
         {
             String friendUsername = getFriendUsername(friendEmail);
@@ -393,11 +409,10 @@ public class Interface {
     }
 
     public void unfollowFriend() throws SQLException {
-        String regex = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
         System.out.println("Please enter the email of the user you would like to unfollow.");
         String friendEmail = scanner.next();
         scanner.nextLine();
-        boolean matches = friendEmail.matches(regex);
+        boolean matches = friendEmail.matches(emailRegex);
         if (matches)
         {
             String friendUsername = getFriendUsername(friendEmail);
