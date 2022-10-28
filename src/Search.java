@@ -12,17 +12,62 @@ public class Search {
         this.scanner = scanner;
     }
 
-    public void printSong(String title, String artist, String album, int length){
+    private void printSong(String title, String artist, String album, int length){
         System.out.println("Song name: " + String.format("%-40s", title) + " Artist name: "
         + String.format("%-25s", artist) + " Album name: " + String.format("%-40s", album) + " Song length: " + length + " seconds");
     }
 
-    public void executeSongsQuery(String queryString, String toAdd) throws SQLException{
+    private void printByYear(ResultSet results) throws SQLException{
+        String currentYear = "";
+        while(results.next()){
+            String year = results.getString(5);
+            if(!currentYear.equals(year)){
+                currentYear = year;
+                System.out.println("\nYear: " + year);
+            }
+            printSong(results.getString(1), results.getString(2), results.getString(3), results.getInt(4));
+        }
+        System.out.println();
+    }
+
+    private void sortByGenre(String queryString, String toAdd, int sort) throws SQLException{
+        String addSelect = ", genre_song.genre_name";
+        String addFrom = ", genre_song";
+        String addWhere = " AND genre_song.sid = song.sid";
+        String orderGenre = " ORDER BY genre_song.genre_name " + (sort==1 ? "ASC" : "DESC") + ", song.title ASC, song_artist.artist_name ASC";
+
+        StringBuilder finalString = new StringBuilder();
+        finalString.append(queryString.substring(0, queryString.lastIndexOf("FROM")-1));
+        finalString.append(addSelect);
+        finalString.append(queryString.substring(queryString.lastIndexOf("FROM")-1, queryString.indexOf("WHERE")-1));
+        finalString.append(addFrom);
+        finalString.append(queryString.substring(queryString.indexOf("WHERE")-1));
+        finalString.append(addWhere);
+        finalString.append(orderGenre);
+        System.out.println(finalString);
+
+        PreparedStatement query = conn.prepareStatement(finalString.toString());
+        query.setString(1, toAdd);
+        ResultSet results = query.executeQuery();
+
+        String currentGenre = "";
+        while(results.next()){
+            String genre = results.getString(6);
+            if(!currentGenre.equals(genre)){
+                currentGenre = genre;
+                System.out.println("\nGenre: " + genre);
+            }
+            printSong(results.getString(1), results.getString(2), results.getString(3), results.getInt(4));
+        }
+        System.out.println();
+    }
+
+    public void executeSongsQuery(String queryString, String toAdd, String type) throws SQLException{
         String orderDefault = " ORDER BY song.title ASC, song_artist.artist_name ASC";
         String orderSongname = " ORDER BY song.title";
         String orderArtistname = " ORDER BY song_artist.artist_name";
-        String orderGenre = " ORDER BY genre_song.genre_name";
         String orderYear = " ORDER BY EXTRACT(YEAR FROM song.release_date)";
+        String orderGenre = " ORDER BY genre_song.genre_name";
         String ascend = " ASC";
         String descend = " DESC";
         String orderAdd = " , song.title ASC, song_artist.artist_name ASC";
@@ -61,11 +106,26 @@ public class Search {
                 scanner.next();
                 continue;
             }
-            if(choice > 4 || choice < 0){
-                System.out.println("Number entered is not a valid option!");
-                continue;
+
+            switch(choice){
+                case 0:
+                    return;
+                case 1:
+                    currentSort = orderSongname;
+                    break;
+                case 2:
+                    currentSort = orderArtistname;
+                    break;
+                case 3:
+                    currentSort = orderGenre;
+                    break;
+                case 4:
+                    currentSort = orderYear;
+                    break;
+                default:
+                    System.out.println("Number entered is not a valid option!");
+                    continue;
             }
-            if(choice == 0) return;
 
             System.out.println("Sort ascending (1) or descending (2)? ");
             int sChoice;
@@ -83,20 +143,11 @@ public class Search {
                 continue;
             }
 
-            switch(choice){
-                case 1:
-                    currentSort = orderSongname;
-                    break;
-                case 2:
-                    currentSort = orderArtistname;
-                    break;
-                case 3:
-                    currentSort = orderGenre;
-                    break;
-                case 4:
-                    currentSort = orderYear;
-                    break;
+            if(choice == 3 && !type.equals("genre")){
+                sortByGenre(queryString, toAdd, sChoice);
+                continue;
             }
+
             currentSort += (sChoice == 1 ? ascend : descend);
             currentSort += orderAdd;
 
@@ -104,6 +155,10 @@ public class Search {
             sQuery.setString(1, toAdd);
             ResultSet sResults = sQuery.executeQuery();
 
+            if(choice == 4){
+                printByYear(sResults);
+                continue;
+            }
             
             while(sResults.next()){
                 printSong(sResults.getString(1), sResults.getString(2), sResults.getString(3), sResults.getInt(4));
@@ -115,36 +170,36 @@ public class Search {
     public void searchByName() throws SQLException{
         System.out.println("Enter song title: ");
         String songTitle = scanner.nextLine();
-        String query = "SELECT DISTINCT song.title, song_artist.artist_name, album.name, song.length, genre_song.genre_name, EXTRACT(YEAR FROM song.release_date)" 
-                + " FROM song, song_artist, album, genre_song, album_song"
-                + " WHERE song.title = ? AND song_artist.sid = song.sid AND album_song.sid = song.sid AND album.aid = album_song.aid AND genre_song.sid = song.sid";
-        executeSongsQuery(query, songTitle);
+        String query = "SELECT DISTINCT song.title, song_artist.artist_name, album.name, song.length, EXTRACT(YEAR FROM song.release_date)" 
+                + " FROM song, song_artist, album, album_song"
+                + " WHERE song.title = ? AND song_artist.sid = song.sid AND album_song.sid = song.sid AND album.aid = album_song.aid";
+        executeSongsQuery(query, songTitle, "song");
     }   
 
     public void searchbyArtist() throws SQLException{
         System.out.println("Enter artist name: ");
         String artistName = scanner.nextLine();
-        String query = "SELECT DISTINCT song.title, song_artist.artist_name, album.name, song.length, genre_song.genre_name, EXTRACT(YEAR FROM song.release_date)" 
-                + " FROM song, song_artist, album, genre_song, album_song"
-                + " WHERE song_artist.artist_name = ? AND song.sid = song_artist.sid AND album_song.sid = song.sid AND album.aid = album_song.aid AND genre_song.sid = song.sid";
-        executeSongsQuery(query, artistName);
+        String query = "SELECT DISTINCT song.title, song_artist.artist_name, album.name, song.length, EXTRACT(YEAR FROM song.release_date)" 
+                + " FROM song, song_artist, album, album_song"
+                + " WHERE song_artist.artist_name = ? AND song.sid = song_artist.sid AND album_song.sid = song.sid AND album.aid = album_song.aid";
+        executeSongsQuery(query, artistName, "artist");
     }
 
     public void searchbyAlbum() throws SQLException{
         System.out.println("Enter album name: ");
         String albumName = scanner.nextLine();
-        String query = "SELECT DISTINCT song.title, song_artist.artist_name, album.name, song.length, genre_song.genre_name, EXTRACT(YEAR FROM song.release_date)" 
-                + " FROM song, song_artist, album, genre_song, album_song"
-                + " WHERE album.name = ? AND album_song.aid = album.aid AND song.sid = album_song.sid AND song_artist.sid = song.sid AND genre_song.sid = song.sid";
-        executeSongsQuery(query, albumName);
+        String query = "SELECT DISTINCT song.title, song_artist.artist_name, album.name, song.length, EXTRACT(YEAR FROM song.release_date)" 
+                + " FROM song, song_artist, album, album_song"
+                + " WHERE album.name = ? AND album_song.aid = album.aid AND song.sid = album_song.sid AND song_artist.sid = song.sid";
+        executeSongsQuery(query, albumName, "album");
     }
 
     public void searchbyGenre() throws SQLException{
         System.out.println("Enter genre: ");
         String genre = scanner.nextLine();
-        String query = "SELECT DISTINCT song.title, song_artist.artist_name, album.name, song.length, genre_song.genre_name, EXTRACT(YEAR FROM song.release_date)" 
+        String query = "SELECT DISTINCT song.title, song_artist.artist_name, album.name, song.length, EXTRACT(YEAR FROM song.release_date), genre_song.genre_name" 
                 + " FROM song, song_artist, album, genre_song, album_song"
                 + " WHERE genre_song.genre_name = ? AND song.sid = genre_song.sid AND song_artist.sid = song.sid AND album_song.sid = song.sid AND album.aid = album_song.aid";
-        executeSongsQuery(query, genre);
+        executeSongsQuery(query, genre, "genre");
     }
 }
