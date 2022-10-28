@@ -72,8 +72,6 @@ public class Collection {
 
     public void displayAll() throws SQLException {
         ArrayList<String> collectionNames = new ArrayList<>();
-        int totalDuration = 0;
-        int totalSongs = 0;
 
         PreparedStatement pst = conn.prepareStatement("SELECT name FROM playlist WHERE username = ? ORDER BY name ASC");
         pst.setString(1, username);
@@ -84,6 +82,8 @@ public class Collection {
 
         System.out.println("\nMy collections:");
         for (String name : collectionNames) {
+            int totalDuration = 0;
+            int totalSongs = 0;
             System.out.println("-Collection " + name);
             PreparedStatement collectionQuery = conn.prepareStatement("SELECT pid FROM playlist WHERE name = ? and username = ?");
             collectionQuery.setString(1, name);
@@ -106,7 +106,7 @@ public class Collection {
                 totalDuration += cResultSet2.getInt("length");
             }
             System.out.println("-Total songs: " + totalSongs);
-            System.out.println("-Total duration: " + totalDuration);
+            System.out.println("-Total duration: " + totalDuration + " seconds\n");
         }
     }
 
@@ -122,7 +122,7 @@ public class Collection {
         nameQuery.setString(2, username);
         ResultSet nameResult = nameQuery.executeQuery();
         if (nameResult.next()) {
-            System.out.println("There is already a collection with that name!");
+            System.out.println("There is already a collection with that name!\n");
         }
         else {
             PreparedStatement cNameUpdate = conn.prepareStatement("UPDATE playlist SET name = ? WHERE pid = ?");
@@ -130,7 +130,7 @@ public class Collection {
             cNameUpdate.setInt(2, collection.pid);
             cNameUpdate.executeUpdate();
 
-            System.out.print("Collection " + collection.name + " renamed to " + nameResult + "!");
+            System.out.print("Collection " + collection.name + " renamed to " + newName + "!\n");
         }
     }
 
