@@ -333,12 +333,12 @@ public class Interface {
                 case 1:
                     System.out.print("Enter song name: ");
                     String songName = scanner.nextLine();
-                    Listen.listenSong(conn, scanner, songName);
+                    Listen.listenSong(conn, scanner, songName, this.currentUsername);
                     break;
                 case 2:
                     System.out.print("Enter album name: ");
                     String albumName = scanner.nextLine();
-                    Listen.listenAlbum(conn, scanner, albumName);
+                    Listen.listenAlbum(conn, scanner, albumName, this.currentUsername);
                     break;
                 default:
                     System.out.println("Number entered is not a valid option!");
