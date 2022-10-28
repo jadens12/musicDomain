@@ -92,17 +92,16 @@ public class Friends {
             {
                 friendNames.add(rs.getString("username2"));
             }
-            for (String name : friendNames)
+            for (int i = 0; i < friendNames.size(); i++)
             {
-                PreparedStatement getFriendEmail = conn.prepareStatement("SELECT username FROM users WHERE email = ?");
-                getFriendEmail.setString(1, name);
+                PreparedStatement getFriendEmail = conn.prepareStatement("SELECT email FROM users WHERE username = ?");
+                getFriendEmail.setString(1, friendNames.get(i));
                 ResultSet emails = getFriendEmail.executeQuery();
                 while (emails.next())
                 {
-                    System.out.println(rs.getString("email"));
+                    System.out.println(emails.getString("email"));
                 }
             }
-            System.out.println("\n");
         }
         else
         {
