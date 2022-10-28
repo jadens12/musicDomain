@@ -12,9 +12,18 @@ public class Search {
         this.scanner = scanner;
     }
 
-    private void printSong(String title, String artist, String album, int length){
-        System.out.println("Song name: " + String.format("%-40s", title) + " Artist name: "
-        + String.format("%-25s", artist) + " Album name: " + String.format("%-40s", album) + " Song length: " + length + " seconds");
+    private void printSong(String title, String artist, String album, int length) throws SQLException{
+        PreparedStatement query = conn.prepareStatement("SELECT COUNT (user_song.sid) FROM user_song, song WHERE song.title = ? AND user_song.sid = song.sid");
+        query.setString(1, title);
+        ResultSet results = query.executeQuery();
+        results.next();
+        int listenCount = results.getInt(1);
+
+        System.out.println("Song name: " + String.format("%-40s", title) 
+        + " Artist name: " + String.format("%-30s", artist) 
+        + " Album name: " + String.format("%-40s", album) 
+        + " Song length: " + length + " seconds"
+        + " \tListen count: " + listenCount);
     }
 
     private void printByYear(ResultSet results) throws SQLException{
@@ -44,7 +53,6 @@ public class Search {
         finalString.append(queryString.substring(queryString.indexOf("WHERE")-1));
         finalString.append(addWhere);
         finalString.append(orderGenre);
-        System.out.println(finalString);
 
         PreparedStatement query = conn.prepareStatement(finalString.toString());
         query.setString(1, toAdd);
