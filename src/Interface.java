@@ -1,5 +1,4 @@
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.InputMismatchException;
 
@@ -234,9 +233,6 @@ public class Interface {
                     collection();
                     break;
                 case 2:
-                    // all search stuff: by song, by artist, by album, by genre
-                    // allow users to add song or album to collection?
-                    // also allow user to play song? i guess? not sure...
                     search();
                     break;
                 case 3:
@@ -409,7 +405,8 @@ public class Interface {
             "1) Search by song name \n" +
             "2) Search by artist name \n" + 
             "3) Search by album name \n" + 
-            "4) Search by genre");
+            "4) Search by genre\n" +
+            "0) Back");
 
             int choice;
             try {
