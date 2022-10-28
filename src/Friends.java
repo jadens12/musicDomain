@@ -92,6 +92,7 @@ public class Friends {
             {
                 friendNames.add(rs.getString("username2"));
             }
+            System.out.println("Your followed friends:");
             for (int i = 0; i < friendNames.size(); i++)
             {
                 PreparedStatement getFriendEmail = conn.prepareStatement("SELECT email FROM users WHERE username = ?");
