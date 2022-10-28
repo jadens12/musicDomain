@@ -52,6 +52,32 @@ public class Listen {
         }
     }
 
+    public static void listenCollection(Connection conn, Scanner scanner, String collection, String username) throws SQLException {
+        int pid = getPlaylistID(conn, collection, username);
+        if (pid != -1){
+            PreparedStatement getCollectionSongs = conn.prepareStatement("SELECT sid FROM song_playlist WHERE pid = ?");
+            getCollectionSongs.setInt(1, pid);
+            ResultSet rs = getCollectionSongs.executeQuery();
+            ArrayList<String> songNames = new ArrayList<>();
+            while (rs.next()) {
+                int sid = rs.getInt("sid");
+                PreparedStatement getSongName = conn.prepareStatement("SELECT title FROM song WHERE sid = ?");
+                getSongName.setInt(1, sid);
+                ResultSet rs2 = getSongName.executeQuery();
+                if (rs2.next()){
+                    songNames.add(rs2.getString("title"));
+                }
+            }
+            System.out.println("You are now listening to your collection " + collection + ":");
+            for (int i = 0; i < songNames.size(); i++){
+                listenSong(conn, scanner, songNames.get(i), username);
+            }
+        }
+        else {
+            System.out.println("That is not a valid collection name!");
+        }
+    }
+
     private static int getAlbumID(Connection conn, String album) throws SQLException {
         PreparedStatement getAlbumID = conn.prepareStatement("SELECT aid FROM album WHERE name = ?");
         getAlbumID.setString(1, album);
@@ -81,5 +107,17 @@ public class Listen {
             return songID;
         }
         else return -1;
+    }
+
+    private static int getPlaylistID(Connection conn, String collection, String username) throws SQLException {
+        PreparedStatement getPlaylistID = conn.prepareStatement("SELECT pid FROM playlist WHERE username = ? AND name = ?");
+        getPlaylistID.setString(1, username);
+        getPlaylistID.setString(2, collection);
+        ResultSet rs = getPlaylistID.executeQuery();
+        int playlistID = -1;
+        while (rs.next()) {
+            playlistID = Integer.parseInt(rs.getString("pid"));
+        }
+        return playlistID;
     }
 }

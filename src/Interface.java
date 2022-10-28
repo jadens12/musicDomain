@@ -314,6 +314,7 @@ public class Interface {
             System.out.println("\nListen:\n"
             + "1) Listen to a song\n"
             + "2) Listen to an album\n"
+            + "3) Listen to a collection\n"
             + "0) Back");
 
             int listen;
@@ -339,6 +340,11 @@ public class Interface {
                     System.out.print("Enter album name: ");
                     String albumName = scanner.nextLine();
                     Listen.listenAlbum(conn, scanner, albumName, this.currentUsername);
+                    break;
+                case 3:
+                    System.out.print("Enter collection name: ");
+                    String collectionName = scanner.nextLine();
+                    Listen.listenCollection(conn, scanner, collectionName, this.currentUsername);
                     break;
                 default:
                     System.out.println("Number entered is not a valid option!");
