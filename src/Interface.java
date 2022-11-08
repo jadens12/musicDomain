@@ -13,6 +13,7 @@ public class Interface {
 
     Collection myCollections;
     Search search;
+    MostPopular popular;
     
     public Interface(Connection conn) throws SQLException {
         this.conn = conn;
@@ -94,6 +95,7 @@ public class Interface {
             this.currentUsername = username;
             myCollections = new Collection(conn, scanner, currentUsername);
             search = new Search(conn, scanner);
+            popular = new MostPopular(conn, scanner, username);
             homeScreen();
             return;
         }
@@ -213,6 +215,7 @@ public class Interface {
             + "2) Search\n"
             + "3) Friends\n"
             + "4) Listen\n"
+            + "5) Popular songs\n"
             + "0) Quit");
 
             int choice;
@@ -240,6 +243,9 @@ public class Interface {
                     break;
                 case 4:
                     listen();
+                    break;
+                case 5:
+                    popularMenu();
                     break;
                 default:
                     System.out.println("Number entered is not a valid option!");
@@ -438,6 +444,43 @@ public class Interface {
                     break;
                 case 4:
                     search.searchbyGenre();
+                    break;
+                default:
+                    System.out.println("Number entered is not a valid option!");
+                    break;
+            }
+        }
+    }
+
+    public void popularMenu() throws SQLException{
+        while(true){
+            System.out.println("Enter a number of your choice: \n" +
+            "1) Top 50 songs in the last month \n" +
+            "2) Top 50 songs among my friends\n" +
+            "3) Top 5 genres of the month\n" +
+            "0) Back");
+
+            int choice;
+            try {
+                choice = scanner.nextInt();
+                scanner.nextLine();
+            }
+            catch (InputMismatchException e){
+                System.out.println("Please enter a number.");
+                scanner.next();
+                continue;
+            }
+            switch (choice) {
+                case 0:
+                    return;
+                case 1:
+                    popular.popularLastMonth();
+                    break;
+                case 2:
+                    // popular among friends
+                    break;
+                case 3:
+                    // popular genres
                     break;
                 default:
                     System.out.println("Number entered is not a valid option!");
