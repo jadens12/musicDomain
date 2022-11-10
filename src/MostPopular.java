@@ -1,4 +1,6 @@
 import java.sql.*;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Scanner;
 
 public class MostPopular {
@@ -43,5 +45,31 @@ public class MostPopular {
 
         ResultSet results = query.executeQuery();
         printSongs(results);
-    }   
+    }
+
+    public void popularGenresThisMonth() throws SQLException {
+        String queryString = "SELECT genre_song.genre_name, SUM(songs_listened.listen_count) AS genre_listen_count FROM genre_song, "
+        + "( SELECT sid, SUM(listens) AS listen_count FROM user_song WHERE listen_date > ? GROUP BY sid ) songs_listened"
+        + " WHERE genre_song.sid = songs_listened.sid GROUP BY genre_song.genre_name ORDER BY genre_listen_count DESC LIMIT 5";
+        PreparedStatement query = conn.prepareStatement(queryString);
+        
+        //create the first date of month
+        java.sql.Date todayDate = new Date(System.currentTimeMillis());
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(todayDate);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        GregorianCalendar gregCal = new GregorianCalendar(year, month, 1);
+        java.sql.Date startDate = new Date(gregCal.getTimeInMillis());
+
+        query.setDate(1, startDate);
+        ResultSet results = query.executeQuery();
+
+        System.out.println("\nTop genres of the past month: ");
+        int rank = 1;
+        while (results.next()) {
+            System.out.println(rank + ") " + results.getString(1));
+            rank++;
+        }
+    }
 }
