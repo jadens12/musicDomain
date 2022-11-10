@@ -34,7 +34,7 @@ public class MostPopular {
     public void popularLastMonth() throws SQLException{
         String queryString = "SELECT song.title, song_artist.artist_name, album.name, song.length, songs_listened.listen_count"
                 + " FROM song, song_artist, album, album_song,"
-                + " ( SELECT sid, COUNT(sid) AS listen_count FROM user_song WHERE listen_date > ? GROUP BY sid ) songs_listened"
+                + " ( SELECT sid, SUM(listens) AS listen_count FROM user_song WHERE listen_date > ? GROUP BY sid ) songs_listened"
                 + " WHERE song.sid = songs_listened.sid AND song_artist.sid = song.sid AND album_song.sid = song.sid AND album.aid = album_song.aid"
                 + " ORDER BY songs_listened.listen_count DESC, song.title ASC, song_artist.artist_name LIMIT 50";
         PreparedStatement query = conn.prepareStatement(queryString);
