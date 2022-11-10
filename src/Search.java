@@ -17,7 +17,7 @@ public class Search {
         + " Artist name: " + String.format("%-30s", artist) 
         + " Album name: " + String.format("%-40s", album) 
         + " Song length: " + length + " seconds"
-        + " \tListen count: " + listenCount);
+        + " \tListen count: " + (listenCount == null ? 0 : listenCount));
     }
 
     private void printByYear(ResultSet results) throws SQLException{
@@ -173,7 +173,7 @@ public class Search {
         System.out.println("Enter song title: ");
         String songTitle = scanner.nextLine();
         String query = "SELECT DISTINCT song.title, song_artist.artist_name, album.name, song.length, EXTRACT(YEAR FROM song.release_date)" 
-                + ", ( SELECT COUNT(*) FROM user_song WHERE user_song.sid = song.sid ) AS listen_count"
+                + ", ( SELECT SUM(listens) FROM user_song WHERE user_song.sid = song.sid ) AS listen_count"
                 + " FROM song, song_artist, album, album_song"
                 + " WHERE song.title = ? AND song_artist.sid = song.sid AND album_song.sid = song.sid AND album.aid = album_song.aid";
         executeSongsQuery(query, songTitle, "song");
@@ -183,7 +183,7 @@ public class Search {
         System.out.println("Enter artist name: ");
         String artistName = scanner.nextLine();
         String query = "SELECT DISTINCT song.title, song_artist.artist_name, album.name, song.length, EXTRACT(YEAR FROM song.release_date)" 
-                + ", ( SELECT COUNT(*) FROM user_song WHERE user_song.sid = song.sid ) AS listen_count"
+                + ", ( SELECT SUM(listens) FROM user_song WHERE user_song.sid = song.sid ) AS listen_count"
                 + " FROM song, song_artist, album, album_song"
                 + " WHERE song_artist.artist_name = ? AND song.sid = song_artist.sid AND album_song.sid = song.sid AND album.aid = album_song.aid";
         executeSongsQuery(query, artistName, "artist");
@@ -193,7 +193,7 @@ public class Search {
         System.out.println("Enter album name: ");
         String albumName = scanner.nextLine();
         String query = "SELECT DISTINCT song.title, song_artist.artist_name, album.name, song.length, EXTRACT(YEAR FROM song.release_date)" 
-                + ", ( SELECT COUNT(*) FROM user_song WHERE user_song.sid = song.sid ) AS listen_count"
+                + ", ( SELECT SUM(listens) FROM user_song WHERE user_song.sid = song.sid ) AS listen_count"
                 + " FROM song, song_artist, album, album_song"
                 + " WHERE album.name = ? AND album_song.aid = album.aid AND song.sid = album_song.sid AND song_artist.sid = song.sid";
         executeSongsQuery(query, albumName, "album");
@@ -203,7 +203,7 @@ public class Search {
         System.out.println("Enter genre: ");
         String genre = scanner.nextLine();
         String query = "SELECT DISTINCT song.title, song_artist.artist_name, album.name, song.length, EXTRACT(YEAR FROM song.release_date)"
-                + ", ( SELECT COUNT(*) FROM user_song WHERE user_song.sid = song.sid ) AS listen_count, genre_song.genre_name" 
+                + ", ( SELECT SUM(listens) FROM user_song WHERE user_song.sid = song.sid ) AS listen_count, genre_song.genre_name" 
                 + " FROM song, song_artist, album, genre_song, album_song"
                 + " WHERE genre_song.genre_name = ? AND song.sid = genre_song.sid AND song_artist.sid = song.sid AND album_song.sid = song.sid AND album.aid = album_song.aid";
         executeSongsQuery(query, genre, "genre");
