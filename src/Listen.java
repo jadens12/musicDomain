@@ -9,15 +9,27 @@ public class Listen {
     public static void listenSong(Connection conn, Scanner scanner, String song, String username) throws SQLException {
         int sid = getSongID(conn, song);
         if (sid != -1){
-            PreparedStatement checkListen = conn.prepareStatement("SELECT username FROM user_song WHERE sid = ? AND username = ?");
+            java.sql.Date todayDate = new Date(System.currentTimeMillis());
+            PreparedStatement checkListen = conn.prepareStatement("SELECT listens FROM user_song WHERE sid = ? AND username = ? AND listen_date = ?");
             checkListen.setInt(1, sid);
             checkListen.setString(2, username);
+            checkListen.setDate(3, todayDate);
             ResultSet rs = checkListen.executeQuery();
             if (!rs.next()) {
-                PreparedStatement addListen = conn.prepareStatement("INSERT INTO user_song VALUES (?, ?)");
+                PreparedStatement addListen = conn.prepareStatement("INSERT INTO user_song VALUES (?, ?, ?, 1)");
                 addListen.setInt(1, sid);
                 addListen.setString(2, username);
+                addListen.setDate(3, todayDate);
                 addListen.executeUpdate();
+            }
+            else {
+                int listens = rs.getInt(1);
+                PreparedStatement modifyListen = conn.prepareStatement("UPDATE user_song SET listens = ? WHERE sid = ? AND username = ? AND listen_date = ?");
+                modifyListen.setInt(1, listens + 1);
+                modifyListen.setInt(2, sid);
+                modifyListen.setString(3, username);
+                modifyListen.setDate(4, todayDate);
+                modifyListen.executeUpdate();
             }
             System.out.println("You listened to the song " + song + "!");
         }
