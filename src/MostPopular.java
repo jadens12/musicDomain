@@ -36,7 +36,7 @@ public class MostPopular {
                 + " FROM song, song_artist, album, album_song,"
                 + " ( SELECT sid, SUM(listens) AS listen_count FROM user_song WHERE listen_date > ? GROUP BY sid ) songs_listened"
                 + " WHERE song.sid = songs_listened.sid AND song_artist.sid = song.sid AND album_song.sid = song.sid AND album.aid = album_song.aid"
-                + " ORDER BY songs_listened.listen_count DESC, song.title ASC, song_artist.artist_name LIMIT 50";
+                + " ORDER BY songs_listened.listen_count DESC, song.title ASC, song_artist.artist_name ASC LIMIT 50";
         PreparedStatement query = conn.prepareStatement(queryString);
         java.sql.Date todayDate = new Date(System.currentTimeMillis() - 2629800000L);
         query.setDate(1, todayDate);
@@ -44,4 +44,17 @@ public class MostPopular {
         ResultSet results = query.executeQuery();
         printSongs(results);
     }   
+
+    public void popularAmongFriends() throws SQLException{
+        String queryString = "SELECT song.title, song_artist.artist_name, album.name, song.length, songs_listened.listen_count"
+                + " FROM song, song_artist, album, album_song,"
+                + " ( SELECT sid, SUM(listens) AS listen_count FROM user_song WHERE username IN ( SELECT username2 FROM user_user WHERE username1 = ?) GROUP BY sid ) songs_listened"
+                + " WHERE song.sid = songs_listened.sid AND song_artist.sid = song.sid AND album_song.sid = song.sid AND album.aid = album_song.aid"
+                + " ORDER BY songs_listened.listen_count DESC, song.title ASC, song_artist.artist_name ASC LIMIT 50";
+        PreparedStatement query = conn.prepareStatement(queryString);
+        query.setString(1, username);
+
+        ResultSet results = query.executeQuery();
+        printSongs(results);
+    }
 }

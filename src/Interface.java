@@ -481,7 +481,7 @@ public class Interface {
                     popular.popularLastMonth();
                     break;
                 case 2:
-                    // popular among friends
+                    popular.popularAmongFriends();
                     break;
                 case 3:
                     // popular genres
