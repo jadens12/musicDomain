@@ -216,6 +216,7 @@ public class Interface {
             + "3) Friends\n"
             + "4) Listen\n"
             + "5) Popular songs\n"
+            + "6) My Profile\n"
             + "0) Quit");
 
             int choice;
@@ -246,6 +247,9 @@ public class Interface {
                     break;
                 case 5:
                     popularMenu();
+                    break;
+                case 6:
+                    showProfile();
                     break;
                 default:
                     System.out.println("Number entered is not a valid option!");
@@ -487,5 +491,43 @@ public class Interface {
                     break;
             }
         }
+    }
+
+    public void showProfile() throws SQLException {
+        System.out.println("\n" + currentUsername + "'s profile:");
+
+        // number of collections
+        PreparedStatement collectionQuery = conn.prepareStatement("SELECT COUNT(pid) FROM playlist WHERE username = ?");
+        collectionQuery.setString(1, currentUsername);
+        ResultSet collectionResult = collectionQuery.executeQuery();
+        if (!collectionResult.next()) {
+            System.out.println("Unable to get user data!");
+            return;
+        }
+        int collectionCount = collectionResult.getInt(1);
+        while (collectionResult.next()) {}
+        System.out.println("\tNumber of collections: " + collectionCount);
+
+        // number of followers
+        PreparedStatement followerQuery = conn.prepareStatement("SELECT COUNT(username1) FROM user_user WHERE username2 = ?");
+        followerQuery.setString(1, currentUsername);
+        ResultSet followerResult = followerQuery.executeQuery();
+        if (!followerResult.next()) {
+            System.out.println("Unable to get user data!");
+            return;
+        }
+        int followerCount = followerResult.getInt(1);
+        System.out.println("\tFollowers: " + followerCount);
+
+        // number of following
+        PreparedStatement followingQuery = conn.prepareStatement("SELECT COUNT(username2) FROM user_user WHERE username1 = ?");
+        followingQuery.setString(1, currentUsername);
+        ResultSet followingResult = followingQuery.executeQuery();
+        if (!followingResult.next()) {
+            System.out.println("Unable to get user data!");
+            return;
+        }
+        int followingCount = followingResult.getInt(1);
+        System.out.println("\tFollowing: " + followingCount);
     }
 }
