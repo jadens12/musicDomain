@@ -458,7 +458,7 @@ public class Interface {
 
     public void popularMenu() throws SQLException{
         while(true){
-            System.out.println("Enter a number of your choice: \n" +
+            System.out.println("\nEnter a number of your choice: \n" +
             "1) Top 50 songs in the last month \n" +
             "2) Top 50 songs among my friends\n" +
             "3) Top 5 genres of the month\n" +
@@ -484,7 +484,7 @@ public class Interface {
                     popular.popularAmongFriends();
                     break;
                 case 3:
-                    // popular genres
+                    popular.popularGenresThisMonth();
                     break;
                 default:
                     System.out.println("Number entered is not a valid option!");
