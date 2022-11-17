@@ -48,6 +48,14 @@ public class MostPopular {
     }   
 
     public void popularAmongFriends() throws SQLException{
+        PreparedStatement viewFollowed = conn.prepareStatement("SELECT username2 FROM user_user WHERE username1 = ?");
+        viewFollowed.setString(1, username);
+        ResultSet rs = viewFollowed.executeQuery();
+
+        if (!(rs.next())){
+            System.out.println("You have no friends!");
+        }
+
         String queryString = "SELECT song.title, song_artist.artist_name, album.name, song.length, songs_listened.listen_count"
                 + " FROM song, song_artist, album, album_song,"
                 + " ( SELECT sid, SUM(listens) AS listen_count FROM user_song WHERE username IN ( SELECT username2 FROM user_user WHERE username1 = ?) GROUP BY sid ) songs_listened"
