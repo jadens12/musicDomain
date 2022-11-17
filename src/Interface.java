@@ -538,5 +538,19 @@ public class Interface {
         }
         int followingCount = followingResult.getInt(1);
         System.out.println("\tFollowing: " + followingCount);
+
+        // top 10 artists
+        PreparedStatement artistsQuery = conn.prepareStatement("SELECT song_artist.artist_name, SUM(user_song.listens) as listen_count"
+                + " FROM user_song, song_artist WHERE user_song.username = ? AND user_song.sid = song_artist.sid GROUP By song_artist.artist_name"
+                + " ORDER BY listen_count DESC LIMIT 10");
+        artistsQuery.setString(1, currentUsername);
+        ResultSet artistsResult = artistsQuery.executeQuery();
+        int i=0;
+        System.out.println("\tTop 10 artists:");
+        while(artistsResult.next()){
+            System.out.println("\t\t" + artistsResult.getString(1));
+            i++;
+        }
+        if( i==0 ) System.out.println("\t\tNo listening history!");
     }
 }

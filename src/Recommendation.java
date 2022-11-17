@@ -13,34 +13,6 @@ public class Recommendation {
     }
 
     public void recommend() throws SQLException {
-        /*
-        String recUserArtistsQuery = "SELECT song.title as title, song_artist.artist_name as artist, album.name as album, song.length as length"
-                + " FROM song_artist, album, album_song, song,"
-                + " ( SELECT song_artist.artist_name as name, SUM(user_song.listens) as listen_count FROM user_song, song_artist"
-                + " WHERE user_song.username = ? AND user_song.sid = song_artist.sid GROUP BY song_artist.artist_name ORDER BY listen_count DESC ) artists"
-                + " WHERE song_artist.artist_name = artists.name AND song.sid = song_artist.sid AND album_song.sid= song.sid AND album.aid = album_song.aid"
-                + " AND song.sid NOT IN ( SELECT sid FROM user_song WHERE username = ? ) "
-                + " ORDER BY random() LIMIT 10";
-
-        PreparedStatement query = conn.prepareStatement(recUserArtistsQuery );
-        query.setString(1, username);
-        query.setString(2, username);
-        ResultSet results = query.executeQuery();
-
-        while (results.next()) {
-            String title = results.getString("title");
-            String artist = results.getString("artist");
-            String album = results.getString("album");
-            String length = results.getString("length");
-            System.out.println("Song name: " + String.format("%-40s", title)
-                    + " Artist name: " + String.format("%-30s", artist)
-                    + " Album name: " + String.format("%-40s", album)
-                    + " Song length: " + length + " seconds");
-        }
-        System.out.println();
-        */
-
-
         String genreRecString = "SELECT DISTINCT song.title AS title, song_artist.artist_name AS artist, album.name AS album, song.length AS length, random()"
                 + " FROM song_artist, album, album_song, song, user_song"
                 + " WHERE user_song.username IN ("
