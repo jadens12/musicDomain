@@ -14,6 +14,7 @@ public class Interface {
     Collection myCollections;
     Search search;
     MostPopular popular;
+    Recommendation recommendation;
     
     public Interface(Connection conn) throws SQLException {
         this.conn = conn;
@@ -96,6 +97,7 @@ public class Interface {
             myCollections = new Collection(conn, scanner, currentUsername);
             search = new Search(conn, scanner);
             popular = new MostPopular(conn, scanner, username);
+            recommendation = new Recommendation(conn, scanner, username);
             homeScreen();
             return;
         }
@@ -184,6 +186,9 @@ public class Interface {
         System.out.println("Account '" + newUsername + "' has been created!");
         this.currentUsername = newUsername;
         myCollections = new Collection(conn, scanner, currentUsername);
+        search = new Search(conn, scanner);
+        popular = new MostPopular(conn, scanner, newUsername);
+        recommendation = new Recommendation(conn, scanner, newUsername);
         homeScreen();
     }
 
@@ -217,6 +222,7 @@ public class Interface {
             + "4) Listen\n"
             + "5) Popular songs\n"
             + "6) My Profile\n"
+            + "7) Get song recommendations\n"
             + "0) Quit");
 
             int choice;
@@ -250,6 +256,9 @@ public class Interface {
                     break;
                 case 6:
                     showProfile();
+                    break;
+                case 7:
+                    recommendation.recommend();
                     break;
                 default:
                     System.out.println("Number entered is not a valid option!");
