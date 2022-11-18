@@ -47,7 +47,7 @@ public class Recommendation {
             i++;
         }
 
-        if( i == 0){ // if user has not listening history or no users share top genres
+        if( i == 0){ // if user has no listening history or no users share top genres; gets random songs
             String randomSongsString = "SELECT song.title AS title, song_artist.artist_name AS artist, album.name AS album, song.length AS length, random()"
                     + " FROM song_artist, album, album_song, song, user_song"
                     + " WHERE song.sid = song_artist.sid AND album_song.sid = song.sid AND album.aid = album_song.aid"

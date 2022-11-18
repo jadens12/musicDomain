@@ -28,7 +28,7 @@ public class MostPopular {
             + " Artist name: " + String.format("%-30s", artist) 
             + " Album name: " + String.format("%-40s", album) 
             + " Song length: " + length + " seconds"
-            + "\tListen count: " + listenCount);
+            + "\t\tListen count: " + listenCount);
         }
         System.out.println();
     }
